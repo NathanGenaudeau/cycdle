@@ -6,9 +6,15 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "riders-url": "node src/scraping/ridersUrl.js",
+    "riders-info": "node src/scraping/ridersInfo.js"
   },
   "dependencies": {
+    "alasql": "^4.3.0",
+    "fs": "^0.0.1-security",
+    "got": "^14.2.1",
+    "jsdom": "^24.0.0",
     "vue": "^3.4.19"
   },
   "devDependencies": {
