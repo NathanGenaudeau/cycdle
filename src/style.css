@@ -13,6 +13,28 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1.5em;
+}
+th {
+  text-align: left;
+  font-weight: 500;
+  padding: 0.5em 1em;
+  border-bottom: 2px solid #1a1a1a;
+}
+td {
+  padding: 0.5em 1em;
+  border-bottom: 1px solid #1a1a1a;
+  &.green {
+    color: #2ecc71;
+  }
+  &.red {
+    color: #e74c3c;
+  }
+}
+
 a {
   font-weight: 500;
   color: #646cff;
