@@ -15,6 +15,7 @@
 
 .search {
   position: relative;
+  margin-bottom: 1.5rem;
   
   input {
     font-family: inherit;
@@ -35,24 +36,24 @@
     width: 100%;
     background-color: red;
     border-radius: 8px;
-    border: 1px solid #1a1a1a;
   }
 }
 
 table {
-  border-collapse: collapse;
   width: 100%;
-  margin-bottom: 1.5em;
+  border-spacing: 4px;
+  table-layout: fixed;
 }
 th {
+  font-size: 14px;
+  padding: 0.5rem;
+  border-bottom: 1px solid #fefefe;
   text-align: center;
-  font-weight: 500;
-  padding: 0.5em 1em;
-  border-bottom: 2px solid #1a1a1a;
 }
-td {
-  padding: 0.5em 1em;
-  border-bottom: 1px solid #1a1a1a;
+td{
+  padding: 0.5rem;
+  border: 1px solid #fefefe;
+  border-radius: 4px;
   &.green {
     background-color: #2ecc71;
   }

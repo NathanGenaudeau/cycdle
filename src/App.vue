@@ -13,7 +13,6 @@ const choseGame = (choice : string) => {
 </script>
 
 <template>
-  <!--<router-link to="/riders">Coureurs</router-link>-->
   <div>
     <Home v-if="!modeSelected" @gameChoice="choseGame" />
     <Game v-else :mode="modeSelected" />

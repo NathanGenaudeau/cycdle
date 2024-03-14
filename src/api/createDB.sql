@@ -4,6 +4,7 @@ create table rider (
   id uuid primary key not null,
   name text not null,
   team text,
+  team_level enum('WT', 'PRT') not null,
   age integer not null,
   nationality text not null,
   weight integer,

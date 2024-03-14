@@ -26,40 +26,44 @@ async function ridersURL(teamlevel, file) {
   }
 }
 
-async function ridersInfo(url) {
+async function ridersInfo(urls) {
   try {
     alasql(`CREATE FILESTORAGE DATABASE IF NOT EXISTS mydb("./src/api/db.json");
     ATTACH FILESTORAGE DATABASE mydb("./src/api/db.json");
     USE mydb;
     SOURCE "./src/api/createDB.sql";`);
 
-    const file = await fs.readFile(url, 'utf-8');
-    for (const url of file.split('\n')) {
-      const response = await got(url);
-      const page = new JSDOM(response.body).window.document;
-      
-      const uuid = uuidv4();
-      const name = page.querySelector('h1').textContent.replace('  ', ' ');
-      const team = page.querySelector('.red.hideIfMobile').textContent;
-      const infos = page.querySelector('.rdr-info-cont').innerHTML.split('<br>');
-      const age = infos[0].split('(')[1].split(')')[0];
-      const nationality = infos[1].split('href')[1].split('>')[1].split('<')[0];
-      const weight = infos[2].includes('Weight') ? infos[2].split('Weight')[1].split('>')[1].split('kg')[0].trim() : null;
-      const height = infos[2].includes('Height') ? infos[2].split('Height')[1].split('>')[1].split('m')[0].trim() : null;
+    for (const url of urls) {
+      const teamLevel = url.includes('WT') ? 'WT' : 'PRT';
+      const file = await fs.readFile(url, 'utf-8');
 
-      const profile = page.querySelector('.pps').innerHTML.split('<li>').slice(1);
-      const specialities = [];
-      profile.forEach((element) => specialities.push(parseInt(element.split('width: ')[1].split('%')[0], 10)));
+      for (const riderUrl of file.split('\n')) {
+        const response = await got(riderUrl);
+        const page = new JSDOM(response.body).window.document;
+        
+        const uuid = uuidv4();
+        const name = page.querySelector('h1').textContent.replace('  ', ' ');
+        const team = page.querySelector('.red.hideIfMobile').textContent;
+        const infos = page.querySelector('.rdr-info-cont').innerHTML.split('<br>');
+        const age = infos[0].split('(')[1].split(')')[0];
+        const nationality = infos[1].split('href')[1].split('>')[1].split('<')[0];
+        const weight = infos[2].includes('Weight') ? infos[2].split('Weight')[1].split('>')[1].split('kg')[0].trim() : null;
+        const height = infos[2].includes('Height') ? infos[2].split('Height')[1].split('>')[1].split('m')[0].trim() : null;
 
-      const kpis = [];
-      const keyStats = page.querySelector('.rider-kpi').innerHTML.split('<li').slice(1);
-      keyStats.forEach((element) => {
-        const value = parseInt(element.split('nr')[1].split('>')[1].split('<')[0], 10);
-        kpis.push(value);
-      });
+        const profile = page.querySelector('.pps').innerHTML.split('<li>').slice(1);
+        const specialities = [];
+        profile.forEach((element) => specialities.push(parseInt(element.split('width: ')[1].split('%')[0], 10)));
 
-      alasql('INSERT INTO rider VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-      [uuid, name, team, age, nationality, weight, height, specialities[0], specialities[1], specialities[2], specialities[3], specialities[4], kpis[0], kpis[1], kpis[2]]);
+        const kpis = [];
+        const keyStats = page.querySelector('.rider-kpi').innerHTML.split('<li').slice(1);
+        keyStats.forEach((element) => {
+          const value = parseInt(element.split('nr')[1].split('>')[1].split('<')[0], 10);
+          kpis.push(value);
+        });
+
+        alasql('INSERT INTO rider VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        [uuid, name, team, teamLevel, age, nationality, weight, height, specialities[0], specialities[1], specialities[2], specialities[3], specialities[4], kpis[0], kpis[1], kpis[2]]);
+      }
     }
 
   } catch (error) {
@@ -69,5 +73,4 @@ async function ridersInfo(url) {
 // Retrieve profile URLs of the riders from ProCyclingStats
 //await ridersURL(1, 'src/api/data/ridersWT.txt'); // 1 for World Tour, 2 for ProTeam
 //await ridersURL(2, 'src/api/data/ridersPRT.txt');
-ridersInfo('src/api/data/ridersWT.txt');
-//ridersInfo('src/api/data/ridersPRT.txt');
+//await ridersInfo(['src/api/data/ridersWT.txt', 'src/api/data/ridersPRT.txt']);

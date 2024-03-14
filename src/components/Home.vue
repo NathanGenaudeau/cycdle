@@ -8,7 +8,7 @@
 
         <h2 @click="$emit('gameChoice', 'rider-wt')">Devinez le coureur World Tour</h2>
         <h2 @click="$emit('gameChoice', 'rider-prt')">Devinez le coureur Pro Tour</h2>
-        <h2 @click="$emit('gameChoice', 'stage-wt')">Devinez l'étape d'une course World Tour</h2>
+        <h2>Devinez l'étape d'une course World Tour [À venir]</h2>
     </div>
 </template>
 
