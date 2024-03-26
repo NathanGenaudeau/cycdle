@@ -18,10 +18,12 @@
     "fs": "^0.0.1-security",
     "got": "^14.2.1",
     "jsdom": "^24.0.0",
+    "seedrandom": "^3.0.5",
     "uuid": "^9.0.1",
     "vue": "^3.4.19"
   },
   "devDependencies": {
+    "@types/seedrandom": "^3.0.8",
     "@vitejs/plugin-vue": "^5.0.4",
     "concurrently": "^8.2.2",
     "nodemon": "^3.1.0",

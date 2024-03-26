@@ -90,27 +90,27 @@ const selectRider = (rider : any) => {
         <span v-if="rider.classic_participation > randomRider.classic_participation">&darr;</span>
       </td>
       <td :class="rider.general_classification === randomRider.general_classification ? 'green' : 'red'">
-        {{ rider.general_classification }} %
+        {{ rider.general_classification }}%
         <span v-if="rider.general_classification < randomRider.general_classification">&uarr;</span>
         <span v-if="rider.general_classification > randomRider.general_classification">&darr;</span>
       </td>
       <td :class="rider.climber === randomRider.climber ? 'green' : 'red'">
-        {{ rider.climber }} %
+        {{ rider.climber }}%
         <span v-if="rider.climber < randomRider.climber">&uarr;</span>
         <span v-if="rider.climber > randomRider.climber">&darr;</span>
       </td>
       <td :class="rider.sprint === randomRider.sprint ? 'green' : 'red'">
-        {{ rider.sprint }} %
+        {{ rider.sprint }}%
         <span v-if="rider.sprint < randomRider.sprint">&uarr;</span>
         <span v-if="rider.sprint > randomRider.sprint">&darr;</span>
       </td>
       <td :class="rider.one_day_races === randomRider.one_day_races ? 'green' : 'red'">
-        {{ rider.one_day_races }} %
+        {{ rider.one_day_races }}%
         <span v-if="rider.one_day_races < randomRider.one_day_races">&uarr;</span>
         <span v-if="rider.one_day_races > randomRider.one_day_races">&darr;</span>
       </td>
       <td :class="rider.time_trial === randomRider.time_trial ? 'green' : 'red'">
-        {{ rider.time_trial }} %
+        {{ rider.time_trial }}%
         <span v-if="rider.time_trial < randomRider.time_trial">&uarr;</span>
         <span v-if="rider.time_trial > randomRider.time_trial">&darr;</span>
       </td>
