@@ -11,18 +11,29 @@ const props = defineProps({
 });
 
 onMounted(async () => {
+  if (localStorage.getItem('lastPlayed') !== new Date().toLocaleDateString()) {
+    localStorage.setItem('lastPlayed', new Date().toLocaleDateString());
+  } else {
+    guesses.value = JSON.parse(localStorage.getItem('guesses') as string);
+  }
+
   randomRider.value = (await (await fetch(`http://localhost:3000/api/riders/random?mode=${props.mode}`)).json())[0];
   console.log('Coureur aléatoire : ', randomRider.value.name);
 });
 
 const riderInput = async () => {
-  if (input.value.length > 2) {
+  if (input.value.length >= 2) {
     riders.value = await (await fetch(`http://localhost:3000/api/riders/search/${input.value}?mode=${props.mode}`)).json();
+  } else {
+    riders.value = [];
   }
 };
 
 const selectRider = (rider : any) => {
-  if (!guesses.value.includes(rider)) guesses.value.unshift(rider);
+  if (!guesses.value.includes(rider)) {
+    guesses.value.unshift(rider);
+    localStorage.setItem('guesses', JSON.stringify(guesses.value));
+  }
   riders.value = [];
   input.value = '';
 };
@@ -30,7 +41,7 @@ const selectRider = (rider : any) => {
 
 <template>
   <div class="search">
-    <input type="text" v-model="input" @input="riderInput" placeholder="Recherche d'un coureur" />
+    <input type="text" v-model="input" @input="riderInput" placeholder="Entrez le nom d'un coureur" />
     <ul v-if="riders" class="search-riders">
       <li v-for="rider in riders" :key="rider.id" @click="selectRider(rider)">
         {{ rider.name }}
