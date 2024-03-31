@@ -2,6 +2,8 @@ import alasql from 'alasql';
 import express from 'express';
 import cors from 'cors';
 import seedrandom from 'seedrandom';
+import { CronJob } from 'cron';
+import { ridersInfo } from './create-riders-database.js';
 
 const port = process.env.PORT || 3000;
 
@@ -30,3 +32,9 @@ app.get("/api/riders/search/:name", (req, res) => {
 app.listen(port, () => {
   console.log("Server listening on port", port);
 });
+
+// Cron job to update the database every day at 5:00 AM
+new CronJob('0 5 * * *', async () => {
+  await ridersInfo(['src/api/data/ridersWT.txt', 'src/api/data/ridersPRT.txt']);
+  alasql('ATTACH FILESTORAGE DATABASE mydb("./src/api/db.json"); USE mydb;');
+}, null, true, 'Europe/Paris');

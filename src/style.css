@@ -53,6 +53,33 @@
   }
 }
 
+.lifes {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  align-items: center;
+  
+  .heart {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    aspect-ratio: 1;
+    border-image: radial-gradient(red 69%, #0000 70%) 84.5%/50%;
+    clip-path: polygon(-41% 0, 50% 91%, 141% 0);
+  }
+
+  .heart-empty {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    aspect-ratio: 1;
+    border-image: radial-gradient(white 69%, #0000 70%) 84.5%/50%;
+    clip-path: polygon(-41% 0, 50% 91%, 141% 0);
+  }
+}
+
+
 table {
   width: 100%;
   border-spacing: 4px;

@@ -43,7 +43,7 @@ async function ridersInfo(urls) {
         
         const uuid = uuidv4();
         const name = page.querySelector('h1').textContent.replace('  ', ' ').normalize("NFD").replace(/\p{Diacritic}/gu, "").replace(/\u0142/g, "l").replace(/\u00f8/g, "o").replace(/\u00e6/g, "ae");
-        const team = page.querySelector('.red.hideIfMobile').textContent;
+        const team = page.querySelector('.red.hideIfMobile')?.textContent;
         const infos = page.querySelector('.rdr-info-cont').innerHTML.split('<br>');
         const age = infos[0].split('(')[1].split(')')[0];
         const nationality = infos[1].split('href')[1].split('>')[1].split('<')[0];
@@ -71,15 +71,7 @@ async function ridersInfo(urls) {
   }
 }
 
-/*function renameRiders() {
-  alasql(`ATTACH FILESTORAGE DATABASE mydb("./src/api/db.json"); USE mydb;`);
-  const riders = alasql('SELECT * FROM rider');
-  riders.forEach((rider) => {
-    const name = rider.name.normalize("NFD").replace(/\p{Diacritic}/gu, "").replace(/\u0142/g, "l").replace(/\u00f8/g, "o").replace(/\u00e6/g, "ae");
-    alasql('UPDATE rider SET name = ? WHERE name = ?', [name, rider.name]);
-  });
-}
-renameRiders();*/
+export { ridersInfo};
 
 // Retrieve profile URLs of the riders from ProCyclingStats
 //await ridersURL(1, 'src/api/data/ridersWT.txt'); // 1 for World Tour, 2 for ProTeam

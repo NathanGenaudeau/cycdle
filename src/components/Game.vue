@@ -5,6 +5,7 @@ const riders : any = ref([]);
 const randomRider : any = ref('');
 const guesses : any = ref([]);
 const input = ref('');
+const lifes = ref(10);
 
 const props = defineProps({
   mode: String
@@ -13,8 +14,11 @@ const props = defineProps({
 onMounted(async () => {
   if (localStorage.getItem('lastPlayed') !== new Date().toLocaleDateString()) {
     localStorage.setItem('lastPlayed', new Date().toLocaleDateString());
+    localStorage.setItem('guessesWT', JSON.stringify([]));
+    localStorage.setItem('guessesPRT', JSON.stringify([]));
   } else {
-    guesses.value = JSON.parse(localStorage.getItem('guesses') as string);
+    guesses.value = props.mode === 'rider-wt' ? JSON.parse(localStorage.getItem('guessesWT') as string) : JSON.parse(localStorage.getItem('guessesPRT') as string);
+    lifes.value = 10 - guesses.value.length;
   }
 
   randomRider.value = (await (await fetch(`http://localhost:3000/api/riders/random?mode=${props.mode}`)).json())[0];
@@ -32,10 +36,12 @@ const riderInput = async () => {
 const selectRider = (rider : any) => {
   if (!guesses.value.includes(rider)) {
     guesses.value.unshift(rider);
-    localStorage.setItem('guesses', JSON.stringify(guesses.value));
+    if (props.mode === 'rider-wt') localStorage.setItem('guessesWT', JSON.stringify(guesses.value));
+    if (props.mode === 'rider-prt') localStorage.setItem('guessesPRT', JSON.stringify(guesses.value));
   }
   riders.value = [];
   input.value = '';
+  lifes.value = rider === randomRider.value ? lifes.value : lifes.value - 1;
 };
 </script>
 
@@ -47,6 +53,12 @@ const selectRider = (rider : any) => {
         {{ rider.name }}
       </li>
     </ul>
+  </div>
+
+  <div class="lifes">
+    <h3>Vies restantes :</h3>
+    <span class="heart" v-for="i in lifes" :key="i"/>
+    <span class="heart-empty" v-for="i in 10 - lifes" :key="i"/>
   </div>
 
   <table>
