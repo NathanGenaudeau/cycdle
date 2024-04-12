@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import { PolarAreaChart } from 'vue-chart-3';
+import { Chart, registerables } from 'chart.js';
+Chart.register(...registerables);
 
 const riders : any = ref([]);
 const randomRider : any = ref('');
@@ -10,6 +13,33 @@ const lifes = ref(10);
 const props = defineProps({
   mode: String
 });
+
+/*const data = {
+  labels: [
+    'Red',
+    'Green',
+    'Yellow',
+    'Grey',
+    'Blue'
+  ],
+  datasets: [{
+    label: 'My First Dataset',
+    data: [11, 16, 7, 3, 14],
+    backgroundColor: [
+      'rgb(255, 99, 132)',
+      'rgb(75, 192, 192)',
+      'rgb(255, 205, 86)',
+      'rgb(201, 203, 207)',
+      'rgb(54, 162, 235)'
+    ]
+  }]
+};
+
+const config = {
+  type: 'polarArea',
+  data: data,
+  options: {}
+};*/
 
 onMounted(async () => {
   if (localStorage.getItem('lastPlayed') !== new Date().toLocaleDateString()) {
@@ -22,7 +52,7 @@ onMounted(async () => {
   }
 
   randomRider.value = (await (await fetch(`http://localhost:3000/api/riders/random?mode=${props.mode}`)).json())[0];
-  console.log('Coureur aléatoire : ', randomRider.value.name);
+  console.log(randomRider.value.name);
 });
 
 const riderInput = async () => {
@@ -77,6 +107,7 @@ const selectRider = (rider : any) => {
       <th>Sprint</th>
       <th>Course d'un jour</th>
       <th>Contre la montre</th>
+      <th>Graphe</th>
     </tr>
     <tr v-for="rider in guesses" :key="rider.id">
       <td>{{ rider.name }}</td>
@@ -136,6 +167,21 @@ const selectRider = (rider : any) => {
         {{ rider.time_trial }}%
         <span v-if="rider.time_trial < randomRider.time_trial">&uarr;</span>
         <span v-if="rider.time_trial > randomRider.time_trial">&darr;</span>
+      </td>
+      <td>
+        <!-- https://vue-chartjs.org/guide/#updating-charts -->
+        <!-- https://vue-chart-3.netlify.app/guide/usage/typescript.html#code-example -->
+        <!-- https://www.chartjs.org/docs/latest/#creating-a-chart -->
+        <!--<Bar :data="{
+          labels: ['GC', 'Montagne', 'Sprint', 'Course d\'un jour', 'Contre la montre'],
+          datasets: [{
+            label: 'Rider',
+            data: [rider.general_classification, rider.climber, rider.sprint, rider.one_day, rider.time_trial],
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
+          }]
+        }" />-->
       </td>
     </tr>
   </table>

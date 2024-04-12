@@ -14,6 +14,7 @@ create table rider (
   time_trial decimal not null,
   sprint decimal not null,
   climber decimal not null,
+  sum_specialities decimal not null,
   win integer not null,
   gt_participation integer not null,
   classic_participation integer not null

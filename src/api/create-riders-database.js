@@ -53,6 +53,7 @@ async function ridersInfo(urls) {
         const profile = page.querySelector('.pps').innerHTML.split('<li>').slice(1);
         const specialities = [];
         profile.forEach((element) => specialities.push(parseInt(element.split('width: ')[1].split('%')[0], 10)));
+        const sumSpecialities = specialities.reduce((acc, cur) => acc + cur, 0);
 
         const kpis = [];
         const keyStats = page.querySelector('.rider-kpi').innerHTML.split('<li').slice(1);
@@ -61,8 +62,8 @@ async function ridersInfo(urls) {
           kpis.push(value);
         });
 
-        alasql('INSERT INTO rider VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-        [uuid, name, team, teamLevel, age, nationality, weight, height, specialities[0], specialities[1], specialities[2], specialities[3], specialities[4], kpis[0], kpis[1], kpis[2]]);
+        alasql('INSERT INTO rider VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        [uuid, name, team, teamLevel, age, nationality, weight, height, specialities[0], specialities[1], specialities[2], specialities[3], specialities[4], sumSpecialities, kpis[0], kpis[1], kpis[2]]);
       }
     }
 
