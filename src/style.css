@@ -13,6 +13,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+canvas {
+  width: 200px;
+  height: 200px;
+}
+
 .search {
   width: 400px;
   position: relative;

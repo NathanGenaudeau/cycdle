@@ -4,42 +4,15 @@ import { PolarAreaChart } from 'vue-chart-3';
 import { Chart, registerables } from 'chart.js';
 Chart.register(...registerables);
 
-const riders : any = ref([]);
-const randomRider : any = ref('');
-const guesses : any = ref([]);
+const riders: any = ref([]);
+const randomRider: any = ref('');
+const guesses: any = ref([]);
 const input = ref('');
 const lifes = ref(10);
 
 const props = defineProps({
   mode: String
 });
-
-/*const data = {
-  labels: [
-    'Red',
-    'Green',
-    'Yellow',
-    'Grey',
-    'Blue'
-  ],
-  datasets: [{
-    label: 'My First Dataset',
-    data: [11, 16, 7, 3, 14],
-    backgroundColor: [
-      'rgb(255, 99, 132)',
-      'rgb(75, 192, 192)',
-      'rgb(255, 205, 86)',
-      'rgb(201, 203, 207)',
-      'rgb(54, 162, 235)'
-    ]
-  }]
-};
-
-const config = {
-  type: 'polarArea',
-  data: data,
-  options: {}
-};*/
 
 onMounted(async () => {
   if (localStorage.getItem('lastPlayed') !== new Date().toLocaleDateString()) {
@@ -63,7 +36,7 @@ const riderInput = async () => {
   }
 };
 
-const selectRider = (rider : any) => {
+const selectRider = (rider: any) => {
   if (!guesses.value.includes(rider)) {
     guesses.value.unshift(rider);
     if (props.mode === 'rider-wt') localStorage.setItem('guessesWT', JSON.stringify(guesses.value));
@@ -73,6 +46,34 @@ const selectRider = (rider : any) => {
   input.value = '';
   lifes.value = rider === randomRider.value ? lifes.value : lifes.value - 1;
 };
+
+const config = {
+  responsive: true
+  // remove arc legend
+};
+
+const formatRiderSpecialities = (rider: any) => {
+  return {
+    /*labels: [
+      'Classement général',
+      'Montagne',
+      'Sprint',
+      'Course d\'un jour',
+      'Contre la montre'
+    ],*/
+    datasets: [{
+      label: 'Spécialités',
+      data: [rider.general_classification, rider.climber, rider.sprint, rider.one_day_races, rider.time_trial],
+      backgroundColor: [
+        'rgb(255, 99, 132)',
+        'rgb(75, 192, 192)',
+        'rgb(255, 205, 86)',
+        'rgb(201, 203, 207)',
+        'rgb(54, 162, 235)'
+      ]
+    }]
+  };
+}
 </script>
 
 <template>
@@ -87,8 +88,8 @@ const selectRider = (rider : any) => {
 
   <div class="lifes">
     <h3>Vies restantes :</h3>
-    <span class="heart" v-for="i in lifes" :key="i"/>
-    <span class="heart-empty" v-for="i in 10 - lifes" :key="i"/>
+    <span class="heart" v-for="i in lifes" :key="i" />
+    <span class="heart-empty" v-for="i in 10 - lifes" :key="i" />
   </div>
 
   <table>
@@ -102,11 +103,11 @@ const selectRider = (rider : any) => {
       <th>Victoire</th>
       <th>Part. GT</th>
       <th>Part. Classique</th>
-      <th>GC</th>
+      <!--<th>GC</th>
       <th>Montagne</th>
       <th>Sprint</th>
       <th>Course d'un jour</th>
-      <th>Contre la montre</th>
+      <th>Contre la montre</th>-->
       <th>Graphe</th>
     </tr>
     <tr v-for="rider in guesses" :key="rider.id">
@@ -143,7 +144,7 @@ const selectRider = (rider : any) => {
         <span v-if="rider.classic_participation < randomRider.classic_participation">&uarr;</span>
         <span v-if="rider.classic_participation > randomRider.classic_participation">&darr;</span>
       </td>
-      <td :class="rider.general_classification === randomRider.general_classification ? 'green' : 'red'">
+      <!--<td :class="rider.general_classification === randomRider.general_classification ? 'green' : 'red'">
         {{ rider.general_classification }}%
         <span v-if="rider.general_classification < randomRider.general_classification">&uarr;</span>
         <span v-if="rider.general_classification > randomRider.general_classification">&darr;</span>
@@ -167,25 +168,10 @@ const selectRider = (rider : any) => {
         {{ rider.time_trial }}%
         <span v-if="rider.time_trial < randomRider.time_trial">&uarr;</span>
         <span v-if="rider.time_trial > randomRider.time_trial">&darr;</span>
-      </td>
+      </td>-->
       <td>
-        <!-- https://vue-chartjs.org/guide/#updating-charts -->
-        <!-- https://vue-chart-3.netlify.app/guide/usage/typescript.html#code-example -->
-        <!-- https://www.chartjs.org/docs/latest/#creating-a-chart -->
-        <!--<Bar :data="{
-          labels: ['GC', 'Montagne', 'Sprint', 'Course d\'un jour', 'Contre la montre'],
-          datasets: [{
-            label: 'Rider',
-            data: [rider.general_classification, rider.climber, rider.sprint, rider.one_day, rider.time_trial],
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderColor: 'rgba(255, 99, 132, 1)',
-            borderWidth: 1
-          }]
-        }" />-->
+        <PolarAreaChart :chartData="formatRiderSpecialities(rider)" :config="config" />
       </td>
     </tr>
   </table>
 </template>
-
-<style scoped>
-</style>
