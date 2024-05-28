@@ -29,6 +29,11 @@ app.get("/api/riders/search/:name", (req, res) => {
   res.json(alasql(`SELECT * FROM rider WHERE name ILIKE '%${req.params.name}%' AND team_level = ? LIMIT 5;`, [teamLevel]));
 });
 
+app.get("/api/riders", (req, res) => {
+  const teamLevel = req.query.mode === "rider-wt" ? "WT" : "PRT";
+  res.json(alasql(`SELECT * FROM rider WHERE team_level = ? ORDER BY name;`, [teamLevel]));
+});
+
 app.listen(port, () => {
   console.log("Server listening on port", port);
 });

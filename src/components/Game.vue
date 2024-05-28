@@ -7,7 +7,7 @@ Chart.register(...registerables);
 const riders: any = ref([]);
 const randomRider: any = ref('');
 const guesses: any = ref([]);
-const input = ref('');
+const selectedValue = ref(null);
 const lifes = ref(10);
 
 const headers = [
@@ -36,28 +36,21 @@ onMounted(async () => {
     guesses.value = props.mode === 'rider-wt' ? JSON.parse(localStorage.getItem('guessesWT') as string) : JSON.parse(localStorage.getItem('guessesPRT') as string);
     lifes.value = 10 - guesses.value.length;
   }
-
+  const response = await fetch(`http://localhost:3000/api/riders?mode=${props.mode}`);
+  riders.value = await response.json();
   randomRider.value = (await (await fetch(`http://localhost:3000/api/riders/random?mode=${props.mode}`)).json())[0];
   console.log(randomRider.value.name);
 });
 
-const riderInput = async () => {
-  if (input.value.length >= 2) {
-    riders.value = await (await fetch(`http://localhost:3000/api/riders/search/${input.value}?mode=${props.mode}`)).json();
-  } else {
-    riders.value = [];
-  }
-};
-
-const selectRider = (rider: any) => {
-  if (!guesses.value.includes(rider)) {
-    guesses.value.unshift(rider);
+const selectRider = (riderSelected: any) => {
+  const selectedRider = riders.value.find(rider => rider.name === riderSelected);
+  if (riderSelected && !guesses.value.includes(selectedRider)) {
+    guesses.value.unshift(selectedRider);
     if (props.mode === 'rider-wt') localStorage.setItem('guessesWT', JSON.stringify(guesses.value));
     if (props.mode === 'rider-prt') localStorage.setItem('guessesPRT', JSON.stringify(guesses.value));
+    lifes.value = selectedRider === randomRider.value ? lifes.value : lifes.value - 1;
   }
-  riders.value = [];
-  input.value = '';
-  lifes.value = rider === randomRider.value ? lifes.value : lifes.value - 1;
+  selectedValue.value = '';
 };
 
 const getColor = (value: number) => {
@@ -90,14 +83,14 @@ const formatRiderSpecialities = (rider: any) => {
 </script>
 
 <template>
-  <div class="search">
-    <input type="text" v-model="input" @input="riderInput" placeholder="Entrez le nom d'un coureur" />
-    <ul v-if="riders" class="search-riders">
-      <li v-for="rider in riders" :key="rider.id" @click="selectRider(rider)">
-        {{ rider.name }}
-      </li>
-    </ul>
-  </div>
+  <v-autocomplete
+    label="Cycliste"
+    :items="riders.map(rider => rider.name)"
+    v-model="selectedValue"
+    @update:model-value="selectRider(selectedValue)"
+    placeholder="Entrez le nom d'un coureur"
+    variant="outlined"
+  ></v-autocomplete>
 
   <div class="lifes">
     <h3>Vies restantes :</h3>
