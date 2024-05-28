@@ -12,6 +12,7 @@
     "create-riders-database": "node src/api/create-riders-database.js"
   },
   "dependencies": {
+    "@mdi/font": "^7.4.47",
     "alasql": "^4.3.0",
     "chart.js": "^3.9.1",
     "cors": "^2.8.5",
@@ -22,7 +23,9 @@
     "jsdom": "^24.0.0",
     "seedrandom": "^3.0.5",
     "uuid": "^9.0.1",
-    "vue-chart-3": "^3.1.8"
+    "vite-plugin-vuetify": "^2.0.3",
+    "vue-chart-3": "^3.1.8",
+    "vuetify": "^3.6.7"
   },
   "devDependencies": {
     "@types/seedrandom": "^3.0.8",
