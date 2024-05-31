@@ -13,12 +13,12 @@ const choseGame = (choice : string) => {
 </script>
 
 <template>
-  <div>
-    <Home v-if="!modeSelected" @gameChoice="choseGame" />
-    <Game v-else :mode="modeSelected" />
-  </div>
-  
-</template>
+  <v-layout class="rounded rounded-md" style="height: 100vh;">
+    <v-app-bar title="Cycle"></v-app-bar>
 
-<style scoped>
-</style>
+    <v-main class="d-flex align-center justify-center" style="min-height: 100%;">
+      <Home v-if="!modeSelected" @gameChoice="choseGame" />
+      <Game v-else :mode="modeSelected" />
+    </v-main>
+  </v-layout>
+</template>

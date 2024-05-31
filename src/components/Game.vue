@@ -8,7 +8,6 @@ const riders: any = ref([]);
 const randomRider: any = ref('');
 const guesses: any = ref([]);
 const selectedValue = ref(null);
-const lifes = ref(10);
 
 const headers = [
   { title: 'Nom', key: 'name', sortable: false },
@@ -18,9 +17,9 @@ const headers = [
   { title: 'Taille', key: 'height', sortable: false },
   { title: 'Poids', key: 'weight', sortable: false },
   { title: 'Victoire', key: 'win', sortable: false },
-  { title: 'Participation GT', key: 'gt_participation', sortable: false },
-  { title: 'Participation classique', key: 'classic_participation', sortable: false },
-  { title: 'Stats', key: 'stats', sortable: false }
+  { title: 'Part. GT', key: 'gt_participation', sortable: false },
+  { title: 'Part. Classique', key: 'classic_participation', sortable: false },
+  { title: 'Spécialités', key: 'stats', sortable: false }
 ];
 
 const props = defineProps({
@@ -34,7 +33,6 @@ onMounted(async () => {
     localStorage.setItem('guessesPRT', JSON.stringify([]));
   } else {
     guesses.value = props.mode === 'rider-wt' ? JSON.parse(localStorage.getItem('guessesWT') as string) : JSON.parse(localStorage.getItem('guessesPRT') as string);
-    lifes.value = 10 - guesses.value.length;
   }
   const response = await fetch(`http://localhost:3000/api/riders?mode=${props.mode}`);
   riders.value = await response.json();
@@ -48,34 +46,48 @@ const selectRider = (riderSelected: any) => {
     guesses.value.unshift(selectedRider);
     if (props.mode === 'rider-wt') localStorage.setItem('guessesWT', JSON.stringify(guesses.value));
     if (props.mode === 'rider-prt') localStorage.setItem('guessesPRT', JSON.stringify(guesses.value));
-    lifes.value = selectedRider === randomRider.value ? lifes.value : lifes.value - 1;
   }
-  selectedValue.value = '';
+  selectedValue.value = null;
 };
 
-const getColor = (value: number) => {
-  if (value !== randomRider.value.age) return 'red';
+const getColor = (value: number, type: string) => {
+  if (value !== randomRider.value[type]) return 'red';
   return 'green';
 };
 
-const getArrow = (value: number) => {
-  if (value < randomRider.value.age) return 'mdi-chevron-up';
-  if (value > randomRider.value.age) return 'mdi-chevron-down';
+const getArrow = (value: number, type: string) => {
+  if (value < randomRider.value[type]) return 'mdi-chevron-up';
+  if (value > randomRider.value[type]) return 'mdi-chevron-down';
   return 'mdi-check';
 };
+
+const barChartColors = (value: number, type: string) => {
+  if (value - 3 < randomRider.value[type] && value + 3 > randomRider.value[type]) return 'green';
+  else if (value - 10 < randomRider.value[type] && value + 10 > randomRider.value[type]) return 'orange';
+  else return 'red';
+};
+
+const options = {
+  responsive: true,
+  plugins: {
+    legend: {
+      display: false
+    }
+  }
+};
+
 
 const formatRiderSpecialities = (rider: any) => {
   return {
     labels: ['GC', 'MON', 'SPR', 'CLA', 'CLM'],
     datasets: [{
-      label: ['Spécialités'],
       data: [rider.general_classification, rider.climber, rider.sprint, rider.one_day_races, rider.time_trial],
       backgroundColor: [
-        'rgb(255, 99, 132)',
-        'rgb(75, 192, 192)',
-        'rgb(255, 205, 86)',
-        'rgb(201, 203, 207)',
-        'rgb(54, 162, 235)'
+        barChartColors(rider.general_classification, 'general_classification'),
+        barChartColors(rider.climber, 'climber'),
+        barChartColors(rider.sprint, 'sprint'),
+        barChartColors(rider.one_day_races, 'one_day_races'),
+        barChartColors(rider.time_trial, 'time_trial')
       ]
     }]
   };
@@ -83,29 +95,65 @@ const formatRiderSpecialities = (rider: any) => {
 </script>
 
 <template>
-  <v-autocomplete
-    label="Cycliste"
-    :items="riders.map(rider => rider.name)"
-    v-model="selectedValue"
-    @update:model-value="selectRider(selectedValue)"
-    placeholder="Entrez le nom d'un coureur"
-    variant="outlined"
-  ></v-autocomplete>
+  <div class="game d-block flex-column align-center justify-center">
+    <v-autocomplete
+      label="Cycliste"
+      :items="riders.map(rider => rider.name)"
+      v-model="selectedValue"
+      @update:model-value="selectRider(selectedValue)"
+      placeholder="Entrez le nom d'un coureur"
+      variant="outlined"
+    ></v-autocomplete>
 
-  <div class="lifes">
-    <h3>Vies restantes :</h3>
-    <span class="heart" v-for="i in lifes" :key="i" />
-    <span class="heart-empty" v-for="i in 10 - lifes" :key="i" />
+    <v-data-table :items="guesses" :headers="headers">
+      <template v-slot:header.stats="{ column }">
+        {{ column.title }}<v-icon icon="mdi-information"></v-icon>
+      </template>
+      <template v-slot:item.age="{ value }">
+        <v-chip :color="getColor(value, 'age')">
+          {{ value }} <v-icon :icon="getArrow(value, 'age')"/>
+        </v-chip>
+      </template>
+      <template v-slot:item.team="{ value }">
+        <v-chip :color="getColor(value, 'team')">
+          {{ value }}
+        </v-chip>
+      </template>
+      <template v-slot:item.nationality="{ value }">
+        <v-chip :color="getColor(value, 'nationality')">
+          {{ value }}
+        </v-chip>
+      </template>
+      <template v-slot:item.height="{ value }">
+        <v-chip :color="getColor(value, 'height')">
+          {{ value }} <v-icon :icon="getArrow(value, 'height')"/>
+        </v-chip>
+      </template>
+      <template v-slot:item.weight="{ value }">
+        <v-chip :color="getColor(value, 'weight')">
+          {{ value }} <v-icon :icon="getArrow(value, 'weight')"/>
+        </v-chip>
+      </template>
+      <template v-slot:item.win="{ value }">
+        <v-chip :color="getColor(value, 'win')">
+          {{ value }} <v-icon :icon="getArrow(value, 'win')"/>
+        </v-chip>
+      </template>
+      <template v-slot:item.gt_participation="{ value }">
+        <v-chip :color="getColor(value, 'gt_participation')">
+          {{ value }} <v-icon :icon="getArrow(value, 'gt_participation')"/>
+        </v-chip>
+      </template>
+      <template v-slot:item.classic_participation="{ value }">
+        <v-chip :color="getColor(value, 'classic_participation')">
+          {{ value }} <v-icon :icon="getArrow(value, 'classic_participation')"/>
+        </v-chip>
+      </template>
+      <template v-slot:item.stats="{ item }">
+        <BarChart :chartData="formatRiderSpecialities(item)" :options="options" />
+      </template>
+      <template v-slot:bottom>
+      </template>
+    </v-data-table>
   </div>
-
-  <v-data-table :items="guesses" :headers="headers">
-    <template v-slot:item.age="{ value }">
-      <v-chip :color=getColor(value)>
-        {{ value }} <v-icon :icon="getArrow(value)"/>
-      </v-chip>
-    </template>
-    <template v-slot:item.stats="{ item }">
-      <BarChart :chartData="formatRiderSpecialities(item)" />
-    </template>
-  </v-data-table>
 </template>

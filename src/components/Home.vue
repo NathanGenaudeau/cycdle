@@ -3,28 +3,16 @@
 </script>
 
 <template>
-    <div>
-        <h1>Cycdle</h1>
-
-        <h2 @click="$emit('gameChoice', 'rider-wt')">Devinez le coureur World Tour</h2>
-        <h2 @click="$emit('gameChoice', 'rider-prt')">Devinez le coureur Pro Tour</h2>
-        <h2>Devinez l'étape d'une course World Tour [À venir]</h2>
+  <div class="home">
+    <div class="d-block pa-2">
+      <v-btn size="x-large" rounded="lg" @click="$emit('gameChoice', 'rider-wt')">
+        Devinez le coureur World Tour
+      </v-btn>
     </div>
+    <div class="d-block pa-2">
+      <v-btn size="x-large" rounded="lg" @click="$emit('gameChoice', 'rider-prt')">
+        Devinez le coureur Pro Tour
+      </v-btn>
+    </div>
+  </div>
 </template>
-
-<style scoped>
-    h2 {
-        cursor: pointer;
-    }
-    h2:hover {
-        color: #f00;
-    }
-    h1 {
-        text-align: center;
-    }
-    div {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-</style>
