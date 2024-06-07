@@ -5,3 +5,9 @@
     width: 100%;
   }
 }
+
+.game {
+  position: absolute;
+  top: 20%;
+  width: 85%;
+}

@@ -16,11 +16,14 @@ const headers = [
   { title: 'Nationalité', key: 'nationality', sortable: false },
   { title: 'Taille', key: 'height', sortable: false },
   { title: 'Poids', key: 'weight', sortable: false },
+  { title: 'Clas. UCI', key: 'uci_rank', sortable: false },
   { title: 'Victoire', key: 'win', sortable: false },
   { title: 'Part. GT', key: 'gt_participation', sortable: false },
   { title: 'Part. Classique', key: 'classic_participation', sortable: false },
-  { title: 'Spécialités', key: 'stats', sortable: false }
+  { title: 'Spécialités', key: 'stats', sortable: false, width: '230px' }
 ];
+
+const legendChart = 'GC: Classement général, MON: Grimpeur, SPR: Sprinteur, CLA: Classique, CLM: Contre-la-montre';
 
 const props = defineProps({
   mode: String
@@ -56,8 +59,8 @@ const getColor = (value: number, type: string) => {
 };
 
 const getArrow = (value: number, type: string) => {
-  if (value < randomRider.value[type]) return 'mdi-chevron-up';
-  if (value > randomRider.value[type]) return 'mdi-chevron-down';
+  if ((value < randomRider.value[type] && type !== 'uci_rank') || (value > randomRider.value[type] && type === 'uci_rank')) return 'mdi-chevron-up';
+  if ((value > randomRider.value[type] && type !== 'uci_rank') || (value < randomRider.value[type] && type === 'uci_rank')) return 'mdi-chevron-down';
   return 'mdi-check';
 };
 
@@ -107,7 +110,12 @@ const formatRiderSpecialities = (rider: any) => {
 
     <v-data-table :items="guesses" :headers="headers">
       <template v-slot:header.stats="{ column }">
-        {{ column.title }}<v-icon icon="mdi-information"></v-icon>
+        {{ column.title }}
+        <v-tooltip :text="legendChart">
+          <template v-slot:activator="{ props }">
+            <v-icon icon="mdi-information" v-bind="props"></v-icon>
+          </template>
+        </v-tooltip>
       </template>
       <template v-slot:item.age="{ value }">
         <v-chip :color="getColor(value, 'age')">
@@ -119,9 +127,9 @@ const formatRiderSpecialities = (rider: any) => {
           {{ value }}
         </v-chip>
       </template>
-      <template v-slot:item.nationality="{ value }">
-        <v-chip :color="getColor(value, 'nationality')">
-          {{ value }}
+      <template v-slot:item.nationality="{ item }">
+        <v-chip :color="getColor(item.nationality, 'nationality')">
+          <span :class="`fi fi-${item.flag}`" />&nbsp;{{ item.nationality }}
         </v-chip>
       </template>
       <template v-slot:item.height="{ value }">
@@ -132,6 +140,11 @@ const formatRiderSpecialities = (rider: any) => {
       <template v-slot:item.weight="{ value }">
         <v-chip :color="getColor(value, 'weight')">
           {{ value }} <v-icon :icon="getArrow(value, 'weight')"/>
+        </v-chip>
+      </template>
+      <template v-slot:item.uci_rank="{ value }">
+        <v-chip :color="getColor(value, 'uci_rank')">
+          {{ value }} <v-icon :icon="getArrow(value, 'uci_rank')"/>
         </v-chip>
       </template>
       <template v-slot:item.win="{ value }">

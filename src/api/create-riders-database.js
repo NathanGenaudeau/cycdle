@@ -46,9 +46,13 @@ async function ridersInfo(urls) {
         const team = page.querySelector('.red.hideIfMobile')?.textContent;
         const infos = page.querySelector('.rdr-info-cont').innerHTML.split('<br>');
         const age = infos[0].split('(')[1].split(')')[0];
+        const flag = infos[1].split('flag')[1].split('"')[0].trim();
         const nationality = infos[1].split('href')[1].split('>')[1].split('<')[0];
         const weight = infos[2].includes('Weight') ? infos[2].split('Weight')[1].split('>')[1].split('kg')[0].trim() : null;
         const height = infos[2].includes('Height') ? infos[2].split('Height')[1].split('>')[1].split('m')[0].trim() : null;
+
+        const uci_rank = page.querySelector('.rdr-rankings').innerHTML ? page.querySelector('.rdr-rankings').innerHTML.split('<li>')[0].split('rnk')[1].split('>')[1].split('<')[0] : null;
+        //const photo = page.querySelector('.rdr-img-cont').querySelector('img');
 
         const profile = page.querySelector('.pps').innerHTML.split('<li>').slice(1);
         const specialities = [];
@@ -62,8 +66,8 @@ async function ridersInfo(urls) {
           kpis.push(value);
         });
 
-        alasql('INSERT INTO rider VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-        [uuid, name, team, teamLevel, age, nationality, weight, height, specialities[0], specialities[1], specialities[2], specialities[3], specialities[4], sumSpecialities, kpis[0], kpis[1], kpis[2]]);
+        alasql('INSERT INTO rider VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        [uuid, name, null, team, teamLevel, age, nationality, flag, weight, height, uci_rank, specialities[0], specialities[1], specialities[2], specialities[3], specialities[4], sumSpecialities, kpis[0], kpis[1], kpis[2]]);
       }
     }
 
