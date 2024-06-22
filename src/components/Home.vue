@@ -3,8 +3,9 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
-function redirection(modeSelectionner:string) {
-  router.push({ name: 'Game', params: { mode: modeSelectionner } });
+function redirection(selectedMode: string) {
+  localStorage.setItem('mode', selectedMode);
+  router.push({ name: 'game' });
 }
 
 </script>
