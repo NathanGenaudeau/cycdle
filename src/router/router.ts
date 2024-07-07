@@ -6,18 +6,18 @@ import Game from '../components/Game.vue';
 const router = createRouter({
     routes: [
         {
-            path: '/',
+            path: '/cycdle',
             component: Home
         },
         {
-            path: '/game',
+            path: '/cycdle/game',
             name: 'game',
             component: Game,
             props: true
         },
         {
             path: '/pathMatch(.*)*',
-            redirect: '/'
+            redirect: '/cycdle'
         }
     ],
     history: createWebHistory(),

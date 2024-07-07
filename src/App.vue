@@ -15,7 +15,7 @@ const isCreditDialogActive = ref(false);
   <v-layout class="app rounded rounded-md" style="height: 100vh;">
     <v-app-bar>
       <v-app-bar-title>
-        <v-img :src="logo" class="logo" @click="router.push('/')" />
+        <v-img :src="logo" class="logo" @click="router.push('/cycdle')" />
       </v-app-bar-title>
       <v-btn icon="mdi-help" @click="isHelpDialogActive = true"></v-btn>
       <v-btn icon="mdi-link-variant" @click="isCreditDialogActive = true"></v-btn>
