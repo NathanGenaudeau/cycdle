@@ -11,9 +11,13 @@ const router = createRouter({
         },
         {
             path: '/game',
-            name : 'game',
+            name: 'game',
             component: Game,
-            props : true
+            props: true
+        },
+        {
+            path: '/pathMatch(.*)*',
+            redirect: '/'
         }
     ],
     history: createWebHistory(),

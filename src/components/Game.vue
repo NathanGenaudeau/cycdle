@@ -14,11 +14,11 @@ const isDialogActive = ref(false);
 const shareButtonText = ref('Partager');
  
 const headers = [
-  { title: 'Nom', key: 'name', sortable: false, align: 'center' },
+  { title: 'Nom', key: 'name', sortable: false, maxWidth: '130px', align: 'center' },
   { title: 'Age', key: 'age', sortable: false, align: 'center' },
   { title: 'Equipe', key: 'team', sortable: false, align: 'center' },
   { title: 'Nationalité', key: 'nationality', sortable: false, align: 'center' },
-  { title: 'Poids/Taille', key: 'measurement', sortable: false, align: 'center' },
+  { title: 'Poids / Taille', key: 'measurement', sortable: false, align: 'center' },
   { title: 'Rang UCI', key: 'uci_rank', sortable: false, align: 'center' },
   { title: 'Victoire', key: 'win', sortable: false, align: 'center' },
   { title: 'Grand Tour / Classique', key: 'partGTClassic', sortable: false, align: 'center' },
@@ -129,7 +129,7 @@ const formatRiderSpecialities = (rider: any) => {
 }
  
 const saveToClipboard = () => {
-  const firstDate = new Date('2024-05-29');
+  const firstDate = new Date('2024-06-29');
   const nb = Math.floor((new Date().getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24));
   let textToShare = `Cycdle (@Cycdle) #${nb}\n`;
  
@@ -139,13 +139,12 @@ const saveToClipboard = () => {
         textToShare += getColor(guess[key], key) === 'green' ? '🟩' : '🟥';
       }
     }
-    textToShare += '\n';
-    // textToShare += 'https://cycdle.fun\n';
+    textToShare += 'https://cycdle.gihub.io\n';
   }
  
   navigator.clipboard.writeText(textToShare).then(
     function () {
-      shareButtonText.value = 'Copié !';
+      shareButtonText.value = 'Copié';
       setTimeout(() => {
         shareButtonText.value = 'Partager';
       }, 2000);
@@ -231,22 +230,27 @@ const saveToClipboard = () => {
     <v-dialog max-width="500" v-model="isDialogActive" persistent>
       <template v-slot:default="{ isActive }">
         <v-card>
+          <v-card-title class="d-flex justify-space-between align-center">
+            <div class="text-h5 text-medium-emphasis ps-2">Félicitations !</div>
+            <v-btn icon="mdi-close" variant="text" @click="isActive.value = false" />
+          </v-card-title>
           <v-card-text>
-            Félicitation, vous avez trouvé le coureur du jour !
- 
-            <div v-for="guess in guesses.slice().reverse()" :key="guess.id">
-              <span v-for="key of Object.keys(guess)" :key="key">
-                <v-icon v-if="attributes.includes(key)" icon="mdi mdi-square" :color="getColor(guess[key], key)" />
-              </span>
+            <div>
+              Bravo, vous avez trouvé le coureur du jour ! Partagez votre score à vos amis pour qu'ils essaient de le battre.
             </div>
+            <div class="pixels">
+              <div v-for="guess in guesses.slice().reverse()" :key="guess.id">
+                <span v-for="key of Object.keys(guess)" :key="key">
+                  <v-icon v-if="attributes.includes(key)" icon="mdi mdi-square" :color="getColor(guess[key], key)" />
+                </span>
+              </div>
+            </div>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
             <v-btn @click="saveToClipboard" prepend-icon="mdi-share-variant">
               {{ shareButtonText }}
             </v-btn>
-          </v-card-text>
- 
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn text="Fermer" @click="isActive.value = false"></v-btn>
           </v-card-actions>
         </v-card>
       </template>

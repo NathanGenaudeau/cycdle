@@ -34,6 +34,8 @@
     "@vitejs/plugin-vue": "^5.0.4",
     "concurrently": "^8.2.2",
     "nodemon": "^3.1.0",
+    "sass": "^1.77.6",
+    "sass-loader": "^14.2.1",
     "typescript": "^5.2.2",
     "vite": "^5.1.4",
     "vue-tsc": "^1.8.27"
