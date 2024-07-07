@@ -44,9 +44,9 @@ onMounted(async () => {
     isDialogActive.value = true;
 
   }
-  const response = await fetch(`http://localhost:3000/api/riders?mode=${mode}`);
+  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/riders?mode=${mode}`);
   riders.value = await response.json();
-  randomRider.value = (await (await fetch(`http://localhost:3000/api/riders/random?mode=${mode}`)).json())[0];
+  randomRider.value = (await (await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/riders/random?mode=${mode}`)).json())[0];
   console.log(randomRider.value.name);
 });
  
@@ -161,7 +161,7 @@ const saveToClipboard = () => {
       variant="outlined" :disabled="won" color="#0a74da" base-color="#0a74da" hide-no-data>
     </v-autocomplete>
  
-    <v-data-table :items="guesses" :headers="headers" hide-no-data>
+    <v-data-table :items="guesses" :headers="headers as any" hide-no-data>
       <template v-slot:header.stats="{ column }">
         {{ column.title }}
         <v-tooltip>
@@ -187,17 +187,17 @@ const saveToClipboard = () => {
         </v-chip>
       </template>
       <template v-slot:item.nationality="{ item }">
-        <v-chip :color="getColor(item.nationality, 'nationality')" :prepend-icon="`fi fi-${item.flag}`">
-          {{ item.nationality }}
+        <v-chip :color="getColor((item as any).nationality, 'nationality')" :prepend-icon="`fi fi-${(item as any).flag}`">
+          {{ (item as any).nationality }}
         </v-chip>
       </template>
       <template v-slot:item.measurement="{ item }">
-        <v-chip :color="getColor(item.weight, 'weight')">
-          {{ item.weight || '?? ' }}kg <v-icon :icon="getArrow(item.weight, 'weight')" />
+        <v-chip :color="getColor((item as any).weight, 'weight')">
+          {{ (item as any).weight || '?? ' }}kg <v-icon :icon="getArrow((item as any).weight, 'weight')" />
         </v-chip>
         <v-divider inset thickness="5" color="transparent" />
-        <v-chip :color="getColor(item.height, 'height')">
-          {{ item.height || '?? ' }}m <v-icon :icon="getArrow(item.height, 'height')" />
+        <v-chip :color="getColor((item as any).height, 'height')">
+          {{ (item as any).height || '?? ' }}m <v-icon :icon="getArrow((item as any).height, 'height')" />
         </v-chip>
       </template>
       <template v-slot:item.uci_rank="{ value }">
@@ -211,13 +211,13 @@ const saveToClipboard = () => {
         </v-chip>
       </template>
       <template v-slot:item.partGTClassic="{ item }">
-        <v-chip :color="getColor(item.gt_participation, 'gt_participation')">
-          {{ item.gt_participation }} <v-icon :icon="getArrow(item.gt_participation, 'gt_participation')" />
+        <v-chip :color="getColor((item as any).gt_participation, 'gt_participation')">
+          {{ (item as any).gt_participation }} <v-icon :icon="getArrow((item as any).gt_participation, 'gt_participation')" />
         </v-chip>
         <v-divider inset thickness="5" color="transparent" />
-        <v-chip :color="getColor(item.classic_participation, 'classic_participation')">
-          {{ item.classic_participation }} <v-icon
-            :icon="getArrow(item.classic_participation, 'classic_participation')" />
+        <v-chip :color="getColor((item as any).classic_participation, 'classic_participation')">
+          {{ (item as any).classic_participation }} <v-icon
+            :icon="getArrow((item as any).classic_participation, 'classic_participation')" />
         </v-chip>
       </template>
       <template v-slot:item.stats="{ item }">
