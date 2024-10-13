@@ -11,6 +11,6 @@ export default defineConfig({
       styles: {
         configFile: 'src/styles/variables.scss'
       }
-    })
+    }),
   ],
 })

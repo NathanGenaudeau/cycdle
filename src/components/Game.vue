@@ -47,7 +47,6 @@ onMounted(async () => {
   const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/riders?mode=${mode}`);
   riders.value = await response.json();
   randomRider.value = (await (await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/riders/random?mode=${mode}`)).json())[0];
-  console.log(randomRider.value.name);
 });
  
 const selectRider = (riderSelected: any) => {
@@ -81,8 +80,8 @@ const getArrow = (value: string, type: string) => {
 };
  
 const barChartColors = (value: number, type: string) => {
-  if (value - 3 < randomRider.value[type] && value + 3 > randomRider.value[type]) return 'green';
-  else if (value - 10 < randomRider.value[type] && value + 10 > randomRider.value[type]) return 'orange';
+  if (value - 5 <= randomRider.value[type] && value + 5 >= randomRider.value[type]) return 'green';
+  else if (value - 15 <= randomRider.value[type] && value + 15 >= randomRider.value[type]) return 'orange';
   else return 'red';
 };
  
@@ -139,8 +138,9 @@ const saveToClipboard = () => {
         textToShare += getColor(guess[key], key) === 'green' ? '🟩' : '🟥';
       }
     }
-    textToShare += 'https://cycdle.gihub.io\n';
+    textToShare += '\n';
   }
+  textToShare += 'https://cycdle.fun';
  
   navigator.clipboard.writeText(textToShare).then(
     function () {

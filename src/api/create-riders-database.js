@@ -4,28 +4,39 @@ import fs from 'fs/promises';
 import alasql from 'alasql';
 import { v4 as uuidv4 } from 'uuid';
 
+/**
+ * Retrieves URL of riders from ProCyclingStats website which will be used to build the database
+ * @param {*} teamlevel Level of the team (1 = World Tour | 2 = Pro Tour)
+ * @param {*} file Path to create/save the file 
+ */
 async function ridersURL(teamlevel, file) {
+  fs.writeFile(file, '', { flag: 'w+' }, function(err) {
+    if (err) throw err;
+  });
   try {
-    let nbResults= 0;
     let offset = 0;
+    const maxOffset = teamlevel === 1 ? 500 : 1000;
     do {
       const response = await got(`https://www.procyclingstats.com/rankings.php?offset=${offset}&teamlevel=${teamlevel}&filter=Filter`);
 
       const page = new JSDOM(response.body).window.document;
-      nbResults = parseInt(page.querySelector('b').textContent.split('/')[0], 10);
       const rows = page.querySelectorAll('tbody tr');
       rows.forEach(async (line) => {
-        const url = line.querySelector('td:nth-child(4) a').href;
+        const url = line.querySelector('td:nth-child(5) a').href;
         await fs.appendFile(file, `${url}\n`);
       });
-      offset = parseInt(rows[rows.length - 1].querySelector('td:nth-child(1)').textContent.trim(), 10)
+      offset = parseInt(rows[rows.length - 1].querySelector('td:nth-child(1)').textContent.trim(), 10);
 
-    } while (nbResults === 100);
+    } while (offset < maxOffset);
   } catch (error) {
     console.error('Error:', error.message);
   }
 }
 
+/**
+ * Build database with the URL given in the files.
+ * @param {*} urls Rider's urls
+ */
 async function ridersInfo(urls) {
   try {
     alasql(`CREATE FILESTORAGE DATABASE IF NOT EXISTS mydb("./src/api/db.json");
@@ -37,7 +48,9 @@ async function ridersInfo(urls) {
       const teamLevel = url.includes('WT') ? 'WT' : 'PRT';
       const file = await fs.readFile(url, 'utf-8');
 
-      for (const riderUrl of file.split('\n')) {
+      const riderUrls = file.split('\n');
+      riderUrls.pop();
+      for (const riderUrl of riderUrls) {
         const response = await got(riderUrl);
         const page = new JSDOM(response.body).window.document;
         
@@ -76,9 +89,11 @@ async function ridersInfo(urls) {
   }
 }
 
-export { ridersInfo};
+export { ridersURL, ridersInfo};
 
 // Retrieve profile URLs of the riders from ProCyclingStats
-//await ridersURL(1, 'src/api/data/ridersWT.txt'); // 1 for World Tour, 2 for ProTeam
-//await ridersURL(2, 'src/api/data/ridersPRT.txt');
-//await ridersInfo(['src/api/data/ridersWT.txt', 'src/api/data/ridersPRT.txt']);
+// await ridersURL(1, 'src/api/data/ridersWT.txt'); // 1 for World Tour, 2 for ProTeam
+// await ridersURL(2, 'src/api/data/ridersPRT.txt');
+
+// Create rider's database
+// await ridersInfo(['src/api/data/ridersWT.txt', 'src/api/data/ridersPRT.txt']);

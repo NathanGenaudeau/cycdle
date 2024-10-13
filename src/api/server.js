@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import seedrandom from 'seedrandom';
 import { CronJob } from 'cron';
+import { ridersURL } from './create-riders-database.js';
 import { ridersInfo } from './create-riders-database.js';
 
 const port = process.env.PORT || 3000;
@@ -38,8 +39,10 @@ app.listen(port, () => {
   console.log("Server listening on port", port);
 });
 
-// Cron job to update the database every day at 5:00 AM
-new CronJob('0 5 * * *', async () => {
+// Cron job to update the database every day at 4:00 AM
+new CronJob('0 4 * * *', async () => {
+  await ridersURL(1, 'src/api/data/ridersWT.txt');
+  await ridersURL(2, 'src/api/data/ridersPRT.txt');
   await ridersInfo(['src/api/data/ridersWT.txt', 'src/api/data/ridersPRT.txt']);
   alasql('ATTACH FILESTORAGE DATABASE mydb("./src/api/db.json"); USE mydb;');
 }, null, true, 'Europe/Paris');

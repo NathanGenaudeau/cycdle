@@ -1,7 +1,7 @@
 {
   "name": "cycdle",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev:frontend": "vite",
@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "@types/seedrandom": "^3.0.8",
+    "@vitejs/plugin-basic-ssl": "^1.1.0",
     "@vitejs/plugin-vue": "^5.0.4",
     "concurrently": "^8.2.2",
     "nodemon": "^3.1.0",
