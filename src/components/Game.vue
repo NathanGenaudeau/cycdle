@@ -2,7 +2,10 @@
 import { onMounted, ref } from 'vue';
 import { BarChart } from 'vue-chart-3';
 import { Chart, registerables } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 Chart.register(...registerables);
+Chart.register(ChartDataLabels);
+
  
 const riders: any = ref([]);
 const randomRider: any = ref('');
@@ -75,7 +78,7 @@ const getColor = (value: string, type: string) => {
 const getArrow = (value: string, type: string) => {
   if ((parseFloat(value) < parseFloat(randomRider.value[type]) && type !== 'uci_rank') || (parseFloat(value) > parseFloat(randomRider.value[type]) && type === 'uci_rank')) return 'mdi-chevron-up';
   if ((parseFloat(value) > parseFloat(randomRider.value[type]) && type !== 'uci_rank') || (parseFloat(value) < parseFloat(randomRider.value[type]) && type === 'uci_rank')) return 'mdi-chevron-down';
-  if (value === null) return 'mdi-close';
+  if (!value || !randomRider.value[type]) return 'mdi-close';
   return 'mdi-check';
 };
  
@@ -84,10 +87,58 @@ const barChartColors = (value: number, type: string) => {
   else if (value - 15 <= randomRider.value[type] && value + 15 >= randomRider.value[type]) return 'orange';
   else return 'red';
 };
+
+const compareGraph = (val: number, val2: number) => {
+  if (val - 5 <= val2 && val + 5 >= val2) return '';
+  else if (val > val2) return '⯅';
+  else if (val < val2) return '⯆';
+};
+
+const labelPositionning = (val: number, val2: number) => {
+  return val > val2 ? '-5' : '-20';
+}
  
 const options = {
+  layout: {
+    padding: {
+      top: 25
+    }
+  },
   responsive: true,
   plugins: {
+    datalabels: {
+      color: 'white',
+      anchor: 'end',
+      align: 'end',
+      offset: (context: any) => {
+        switch(context.chart.data.labels[context.dataIndex]) {
+          case 'GC':
+            return labelPositionning(randomRider.value['general_classification'], context.dataset.data[context.dataIndex]);
+          case 'MON':
+            return labelPositionning(randomRider.value['climber'], context.dataset.data[context.dataIndex]);
+          case 'SPR':
+            return labelPositionning(randomRider.value['sprint'], context.dataset.data[context.dataIndex]);
+          case 'CLA':
+            return labelPositionning(randomRider.value['one_day_races'], context.dataset.data[context.dataIndex]);
+          case 'CLM':
+            return labelPositionning(randomRider.value['time_trial'], context.dataset.data[context.dataIndex]);
+        }
+      },
+      formatter: (val: any, context: any) => {
+        switch(context.chart.data.labels[context.dataIndex]) {
+          case 'GC':
+            return compareGraph(randomRider.value['general_classification'], val);
+          case 'MON':
+            return compareGraph(randomRider.value['climber'], val);
+          case 'SPR':
+            return compareGraph(randomRider.value['sprint'], val);
+          case 'CLA':
+            return compareGraph(randomRider.value['one_day_races'], val);
+          case 'CLM':
+            return compareGraph(randomRider.value['time_trial'], val);
+        }
+      }
+    },
     tooltip: {
       callbacks: {
         label: (context: any) => {
@@ -128,7 +179,7 @@ const formatRiderSpecialities = (rider: any) => {
 }
  
 const saveToClipboard = () => {
-  const firstDate = new Date('2024-06-29');
+  const firstDate = new Date('2024-10-10');
   const nb = Math.floor((new Date().getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24));
   let textToShare = `Cycdle (@Cycdle) #${nb}\n`;
  
@@ -140,7 +191,7 @@ const saveToClipboard = () => {
     }
     textToShare += '\n';
   }
-  textToShare += 'https://cycdle.fun';
+  textToShare += '\nhttps://cycdle.fun';
  
   navigator.clipboard.writeText(textToShare).then(
     function () {

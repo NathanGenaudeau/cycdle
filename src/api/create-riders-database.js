@@ -76,7 +76,8 @@ async function ridersInfo(urls) {
         const keyStats = page.querySelector('.rider-kpi').innerHTML.split('<li').slice(1);
         keyStats.forEach((element) => {
           const value = parseInt(element.split('nr')[1].split('>')[1].split('<')[0], 10);
-          kpis.push(value);
+          const newValue = value === 0 ? 1 : value;
+          kpis.push(newValue);
         });
 
         alasql('INSERT INTO rider VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
