@@ -83,8 +83,8 @@ const getColor = (value: string, type: string) => {
 };
  
 const getArrow = (value: string, type: string) => {
-  if (parseFloat(value) < parseFloat(randomRider.value[type])) return 'mdi-chevron-up';
-  if (parseFloat(value) > parseFloat(randomRider.value[type])) return 'mdi-chevron-down';
+  if ((parseFloat(value) < parseFloat(randomRider.value[type]) && type !== 'uci_rank') || (parseFloat(value) > parseFloat(randomRider.value[type]) && type === 'uci_rank')) return 'mdi-chevron-up';
+  if ((parseFloat(value) > parseFloat(randomRider.value[type]) && type !== 'uci_rank') || (parseFloat(value) < parseFloat(randomRider.value[type]) && type === 'uci_rank')) return 'mdi-chevron-down';
   if ((!value || !randomRider.value[type]) && parseFloat(value) !== 0) return 'mdi-close';
   return 'mdi-check';
 };
@@ -188,7 +188,7 @@ const formatRiderSpecialities = (rider: any) => {
 const saveToClipboard = () => {
   const firstDate = new Date('2024-10-10');
   const nb = Math.floor((new Date().getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24));
-  let textToShare = `Cycdle (@Cycdle) #${nb}\n`;
+  let textToShare = `Cycdle (@Cycdle) ${mode === 'rider-wt' ? 'WT' : 'PRT'}#${nb} ${guesses.value.length} essais\n`;
  
   for (const guess of guesses.value.slice().reverse()) {
     for (const key of Object.keys(guess)) {
@@ -212,7 +212,7 @@ const saveToClipboard = () => {
 
 const customFilter = (_itemTitle: any, query: string, item: any) => {
   const name = item.raw.name.toLowerCase();
-  return name.indexOf(query) > -1;
+  return name.indexOf(query.toLowerCase()) > -1;
 }
 </script>
  
@@ -222,20 +222,20 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
       v-model="selectedValue" @update:model-value="selectRider(selectedValue)" placeholder="Entrez le nom d'un coureur"
       variant="outlined" :disabled="won" color="#0a74da" base-color="#0a74da" hide-no-data>
       <template v-slot:chip="{ item }">
-        {{ item.raw.name }}
+        {{ (item as any).raw.name }}
       </template>
       <template v-slot:item="{ props, item }" >
         <v-list-item
           v-bind="props"
-          :title="item.raw.name"
+          :title="(item as any).raw.name"
         >
           <template v-slot:prepend>
             <v-avatar rounded="0" size="60">
-              <v-img class="mb-n6" :src="item.raw.photo" max-width="40px" style="clip-path: inset(0 0 20px 0 round 100px);"/>
+              <v-img class="mb-n6" :src="(item as any).raw.photo" max-width="40px" style="clip-path: inset(0 0 20px 0 round 100px);"/>
             </v-avatar>
           </template>
           <template v-slot:append>
-            <v-icon :icon="`fi fi-${item.raw.flag}`"/>
+            <v-icon :icon="`fi fi-${(item as any).raw.flag}`"/>
           </template>
         </v-list-item>
       </template>
@@ -258,9 +258,9 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
       </template>
       <template v-slot:item.name="{ item }">
         <v-avatar rounded="0" size="120">
-          <v-img :src="item.photo" max-width="80px" style="clip-path: inset(0 0 40px 0 round 100px);"/>
+          <v-img :src="(item as any).photo" max-width="80px" style="clip-path: inset(0 0 40px 0 round 100px);"/>
         </v-avatar>
-        <div class="mt-n8">{{ item.name }}</div>
+        <div class="mt-n8">{{ (item as any).name }}</div>
       </template>
       <template v-slot:item.age="{ value }">
         <v-chip :color="getColor(value, 'age')">
