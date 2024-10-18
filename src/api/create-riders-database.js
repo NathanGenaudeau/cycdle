@@ -15,14 +15,14 @@ async function ridersURL(teamlevel, file) {
   });
   try {
     let offset = 0;
-    const maxOffset = teamlevel === 1 ? 500 : 1000;
+    const maxOffset = teamlevel === 1 ? 400 : 800;
     do {
-      const response = await got(`https://www.procyclingstats.com/rankings.php?offset=${offset}&teamlevel=${teamlevel}&filter=Filter`);
+      const response = await got(`https://www.procyclingstats.com/rankings.php?offset=${offset}&teamlevel=${teamlevel}&filter=Filter&s=uci-individual-daily`);
 
       const page = new JSDOM(response.body).window.document;
       const rows = page.querySelectorAll('tbody tr');
       rows.forEach(async (line) => {
-        const url = line.querySelector('td:nth-child(5) a').href;
+        const url = line.querySelector('td:nth-child(4) a').href;
         await fs.appendFile(file, `${url}\n`);
       });
       offset = parseInt(rows[rows.length - 1].querySelector('td:nth-child(1)').textContent.trim(), 10);
@@ -65,23 +65,26 @@ async function ridersInfo(urls) {
         const height = infos[2].includes('Height') ? infos[2].split('Height')[1].split('>')[1].split('m')[0].trim() : null;
 
         const uci_rank = page.querySelector('.rdr-rankings').innerHTML ? page.querySelector('.rdr-rankings').innerHTML.split('<li>')[0].split('rnk')[1].split('>')[1].split('<')[0] : null;
-        //const photo = page.querySelector('.rdr-img-cont').querySelector('img');
+        const photo = page.querySelector('.rdr-img-cont').querySelector('img');
+        const { buffer } = await got(photo.src).buffer();
+        const img64 = `data:image/jpeg;base64,${Buffer.from(buffer).toString('base64')}`;
 
         const profile = page.querySelector('.pps').innerHTML.split('<li>').slice(1);
         const specialities = [];
-        profile.forEach((element) => specialities.push(parseInt(element.split('width: ')[1].split('%')[0], 10)));
+        profile.forEach((element) => {
+          const value = parseInt(element.split('width: ')[1].split('%')[0], 10);
+          specialities.push(value === 0 ? 1 : value); // put a minimal of 1 to be represented in the BarChart
+        });
         const sumSpecialities = specialities.reduce((acc, cur) => acc + cur, 0);
 
         const kpis = [];
         const keyStats = page.querySelector('.rider-kpi').innerHTML.split('<li').slice(1);
         keyStats.forEach((element) => {
-          const value = parseInt(element.split('nr')[1].split('>')[1].split('<')[0], 10);
-          const newValue = value === 0 ? 1 : value;
-          kpis.push(newValue);
+          kpis.push(parseInt(element.split('nr')[1].split('>')[1].split('<')[0], 10));
         });
 
         alasql('INSERT INTO rider VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-        [uuid, name, null, team, teamLevel, age, nationality, flag, weight, height, uci_rank, specialities[0], specialities[1], specialities[2], specialities[3], specialities[4], sumSpecialities, kpis[0], kpis[1], kpis[2]]);
+        [uuid, name, img64, team, teamLevel, age, nationality, flag, weight, height, uci_rank, specialities[0] || 1, specialities[1], specialities[2], specialities[3], specialities[4], sumSpecialities, kpis[0], kpis[1], kpis[2]]);
       }
     }
 

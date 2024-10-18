@@ -49,23 +49,30 @@ onMounted(async () => {
   }
   const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/riders?mode=${mode}`);
   riders.value = await response.json();
+  updateRidersList();
   randomRider.value = (await (await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/riders/random?mode=${mode}`)).json())[0];
 });
+
+const updateRidersList = () => {
+  riders.value = riders.value.filter((rider: any) => {
+    return !guesses.value.find((guess: any) => guess.id === rider.id);
+  });
+}
  
 const selectRider = (riderSelected: any) => {
-  const selectedRider = riders.value.find((rider: any) => rider.name === riderSelected);
-  if (!selectedRider || selectedRider && guesses.value.find((rider: any) => rider.id === selectedRider.id)) return;
-  if (selectedRider.id === randomRider.value.id) {
+  if (!riderSelected || guesses.value.find((rider: any) => rider.id === riderSelected.id)) return;
+  if (riderSelected.id === randomRider.value.id) {
     won.value = true;
     isDialogActive.value = true;
     if (mode === 'rider-wt') localStorage.setItem('wonWT', JSON.stringify(true))
     if (mode === 'rider-prt') localStorage.setItem('wonPRT', JSON.stringify(true));
   }
  
-  guesses.value.unshift(selectedRider);
+  guesses.value.unshift(riderSelected);
   if (mode === 'rider-wt') localStorage.setItem('guessesWT', JSON.stringify(guesses.value));
   if (mode === 'rider-prt') localStorage.setItem('guessesPRT', JSON.stringify(guesses.value));
   selectedValue.value = null;
+  updateRidersList();
 };
  
 const attributes = ['age', 'team', 'nationality', 'weight', 'height', 'uci_rank', 'win', 'gt_participation', 'classic_participation'];
@@ -76,9 +83,9 @@ const getColor = (value: string, type: string) => {
 };
  
 const getArrow = (value: string, type: string) => {
-  if ((parseFloat(value) < parseFloat(randomRider.value[type]) && type !== 'uci_rank') || (parseFloat(value) > parseFloat(randomRider.value[type]) && type === 'uci_rank')) return 'mdi-chevron-up';
-  if ((parseFloat(value) > parseFloat(randomRider.value[type]) && type !== 'uci_rank') || (parseFloat(value) < parseFloat(randomRider.value[type]) && type === 'uci_rank')) return 'mdi-chevron-down';
-  if (!value || !randomRider.value[type]) return 'mdi-close';
+  if (parseFloat(value) < parseFloat(randomRider.value[type])) return 'mdi-chevron-up';
+  if (parseFloat(value) > parseFloat(randomRider.value[type])) return 'mdi-chevron-down';
+  if ((!value || !randomRider.value[type]) && parseFloat(value) !== 0) return 'mdi-close';
   return 'mdi-check';
 };
  
@@ -90,8 +97,8 @@ const barChartColors = (value: number, type: string) => {
 
 const compareGraph = (val: number, val2: number) => {
   if (val - 5 <= val2 && val + 5 >= val2) return '';
-  else if (val > val2) return '⯅';
-  else if (val < val2) return '⯆';
+  else if (val > val2) return '▲';
+  else if (val < val2) return '▼';
 };
 
 const labelPositionning = (val: number, val2: number) => {
@@ -202,14 +209,36 @@ const saveToClipboard = () => {
     },
   );
 }
- 
+
+const customFilter = (_itemTitle: any, query: string, item: any) => {
+  const name = item.raw.name.toLowerCase();
+  return name.indexOf(query) > -1;
+}
 </script>
  
 <template>
   <div class="game d-block flex-column align-center justify-center">
-    <v-autocomplete label="Rechercher un cycliste" :items="riders.map((rider: any) => rider.name)"
+    <v-autocomplete label="Rechercher un cycliste" :items="riders" :custom-filter="customFilter"
       v-model="selectedValue" @update:model-value="selectRider(selectedValue)" placeholder="Entrez le nom d'un coureur"
       variant="outlined" :disabled="won" color="#0a74da" base-color="#0a74da" hide-no-data>
+      <template v-slot:chip="{ item }">
+        {{ item.raw.name }}
+      </template>
+      <template v-slot:item="{ props, item }" >
+        <v-list-item
+          v-bind="props"
+          :title="item.raw.name"
+        >
+          <template v-slot:prepend>
+            <v-avatar rounded="0" size="60">
+              <v-img class="mb-n6" :src="item.raw.photo" max-width="40px" style="clip-path: inset(0 0 20px 0 round 100px);"/>
+            </v-avatar>
+          </template>
+          <template v-slot:append>
+            <v-icon :icon="`fi fi-${item.raw.flag}`"/>
+          </template>
+        </v-list-item>
+      </template>
     </v-autocomplete>
  
     <v-data-table :items="guesses" :headers="headers as any" hide-no-data>
@@ -226,6 +255,12 @@ const saveToClipboard = () => {
           <p>CLA: Classique</p>
           <p>CLM: Contre-la-montre</p>
         </v-tooltip>
+      </template>
+      <template v-slot:item.name="{ item }">
+        <v-avatar rounded="0" size="120">
+          <v-img :src="item.photo" max-width="80px" style="clip-path: inset(0 0 40px 0 round 100px);"/>
+        </v-avatar>
+        <div class="mt-n8">{{ item.name }}</div>
       </template>
       <template v-slot:item.age="{ value }">
         <v-chip :color="getColor(value, 'age')">
@@ -244,11 +279,11 @@ const saveToClipboard = () => {
       </template>
       <template v-slot:item.measurement="{ item }">
         <v-chip :color="getColor((item as any).weight, 'weight')">
-          {{ (item as any).weight || '?? ' }}kg <v-icon :icon="getArrow((item as any).weight, 'weight')" />
+          {{ (item as any).weight || '-- ' }}kg <v-icon :icon="getArrow((item as any).weight, 'weight')" />
         </v-chip>
         <v-divider inset thickness="5" color="transparent" />
         <v-chip :color="getColor((item as any).height, 'height')">
-          {{ (item as any).height || '?? ' }}m <v-icon :icon="getArrow((item as any).height, 'height')" />
+          {{ (item as any).height || '-- ' }}m <v-icon :icon="getArrow((item as any).height, 'height')" />
         </v-chip>
       </template>
       <template v-slot:item.uci_rank="{ value }">
@@ -272,7 +307,7 @@ const saveToClipboard = () => {
         </v-chip>
       </template>
       <template v-slot:item.stats="{ item }">
-        <BarChart :chartData="formatRiderSpecialities(item)" :options="options" />
+        <BarChart :chartData="formatRiderSpecialities(item)" :options="options" :height="300" />
       </template>
       <template v-slot:bottom>
       </template>
