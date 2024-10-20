@@ -25,7 +25,14 @@
       color: #fff;
       font-weight: 700;
     }
-
+  }
+  p {
+    font-size: 12px;
+    margin-bottom: 16px;
+    a {
+      color: #fff;
+      font-weight: 700;
+    }
   }
 }
 

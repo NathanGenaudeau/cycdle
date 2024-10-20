@@ -18,8 +18,8 @@ const shareButtonText = ref('Partager');
  
 const headers = [
   { title: 'Nom', key: 'name', sortable: false, maxWidth: '130px', align: 'center' },
-  { title: 'Age', key: 'age', sortable: false, align: 'center' },
   { title: 'Equipe', key: 'team', sortable: false, align: 'center' },
+  { title: 'Age', key: 'age', sortable: false, align: 'center' },
   { title: 'Nationalité', key: 'nationality', sortable: false, align: 'center' },
   { title: 'Poids / Taille', key: 'measurement', sortable: false, align: 'center' },
   { title: 'Rang UCI', key: 'uci_rank', sortable: false, align: 'center' },
@@ -188,7 +188,7 @@ const formatRiderSpecialities = (rider: any) => {
 const saveToClipboard = () => {
   const firstDate = new Date('2024-10-10');
   const nb = Math.floor((new Date().getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24));
-  let textToShare = `Cycdle (@Cycdle) ${mode === 'rider-wt' ? 'WT' : 'PRT'}#${nb} ${guesses.value.length} essais\n`;
+  let textToShare = `Cycdle (@Cycdle) ${mode === 'rider-wt' ? 'WT' : 'PRT'}#${nb} - ${guesses.value.length} essais\n`;
  
   for (const guess of guesses.value.slice().reverse()) {
     for (const key of Object.keys(guess)) {
@@ -244,7 +244,7 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
     <v-data-table :items="guesses" :headers="headers as any" hide-no-data>
       <template v-slot:header.stats="{ column }">
         {{ column.title }}
-        <v-tooltip>
+        <v-tooltip open-on-click>
           <template v-slot:activator="{ props }">
             <v-icon icon="mdi-information" v-bind="props"></v-icon>
           </template>
@@ -262,14 +262,14 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
         </v-avatar>
         <div class="mt-n8">{{ (item as any).name }}</div>
       </template>
-      <template v-slot:item.age="{ value }">
-        <v-chip :color="getColor(value, 'age')">
-          {{ value }} <v-icon :icon="getArrow(value, 'age')" />
-        </v-chip>
-      </template>
       <template v-slot:item.team="{ value }">
         <v-chip :color="getColor(value, 'team')">
           {{ value.split(' ').splice(0, 2).join(' ') }} <br /> {{ value.split(' ').splice(2).join(' ') }}
+        </v-chip>
+      </template>
+      <template v-slot:item.age="{ value }">
+        <v-chip :color="getColor(value, 'age')">
+          {{ value }} <v-icon :icon="getArrow(value, 'age')" />
         </v-chip>
       </template>
       <template v-slot:item.nationality="{ item }">

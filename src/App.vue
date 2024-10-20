@@ -32,25 +32,25 @@ const isCreditDialogActive = ref(false);
           <div class="text-h5 ps-2">Comment jouer ?</div>
           <v-btn icon="mdi-close" variant="text" @click="isActive.value = false"></v-btn>
         </v-card-title>
-        <v-card-text>
+        <v-card-text class="modal-text">
  
           <p class="help-text">
-            Chaque jour, un coureur aléatoire est choisi parmi tous ceux en activité et selon le mode de jeu choisi.
-            Le but du jeu est de trouver ce coureur avec le moins d'essais possible.
-            À chaque essai, les informations du coureur que vous avez sélectionné donnerons des indications le coureur
-            recherché.
-            Flèche bas / fléche haut + rouge = valeur incorrecte
-            Tick + vert = valeur correcte
-            Croix + orange = pas d'information
+            Chaque jour, un coureur aléatoire (encore en activité) est choisi parmi les X premiers du classement UCI.
+            Le but est de le trouver en moins d'essais possible.<br/>
+            À chaque essai, les informations du coureur que vous avez sélectionné donnerons des indications sur le coureur
+            recherché.<br/>
+            Flèche haut/bas + rouge = valeur incorrecte<br/>
+            Tick + vert = valeur correcte<br/>
+            Croix + orange = pas d'information<br/>
           </p>
           <p class="help-text">
-            Le graphiaque se base sur les spécialités du coureur selon PCS. Un coureur avec un score
-            de 100 en montagne n'est pas forcément le meilleur du peloton en montagne mais c'est la spécialités dans
-            laquelle il est le meilleur parmis les autres.
-            En ce qui concerne les couleurs du graphique :
-            -> rouge = + de 10 d'écart en positif/négatif
-            -> orange = entre 3 et 10 d'écart (en positif ou négatif)
-            -> vert = correct à 3 près (en + ou -)
+            Le graphique se base sur les spécialités du coureur selon  <a href="https://www.procyclingstats.com/">PCS</a>. Un coureur avec un score
+            de 100 en montagne n'est pas forcément le meilleur du peloton en montagne mais c'est la spécialité dans
+            laquelle il est le meilleur.<br/>
+            Équivalence des couleurs :<br/>
+            Rouge = + de 15% d'écart (en positif ou négatif)<br/>
+            Orange = Entre 5% et 15% d'écart <br/>
+            Vert = Correct à 5% près<br/>
           </p>
         </v-card-text>
       </v-card>
