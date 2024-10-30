@@ -33,24 +33,78 @@ const isCreditDialogActive = ref(false);
           <v-btn icon="mdi-close" variant="text" @click="isActive.value = false"></v-btn>
         </v-card-title>
         <v-card-text class="modal-text">
- 
-          <p class="help-text">
+          <p class="text-justify">
             Chaque jour, un coureur aléatoire (encore en activité) est choisi parmi les X premiers du classement UCI.
-            Le but est de le trouver en moins d'essais possible.<br/>
+            Le but est de le trouver avec le moins d'essais possible.<br/>
             À chaque essai, les informations du coureur que vous avez sélectionné donnerons des indications sur le coureur
-            recherché.<br/>
-            Flèche haut/bas + rouge = valeur incorrecte<br/>
-            Tick + vert = valeur correcte<br/>
-            Croix + orange = pas d'information<br/>
+            recherché.
+            <v-row class="mt-0">
+              <v-col class="d-flex justify-center align-center">
+                <v-sheet>
+                  <v-chip color="green">
+                    68kg <v-icon icon="mdi-check" />
+                  </v-chip>
+                </v-sheet>
+              </v-col>
+              <v-col class="d-flex justify-center align-center">
+                <v-sheet>
+                  <v-chip color="red">
+                    66kg <v-icon icon="mdi-chevron-up" />
+                  </v-chip>
+                </v-sheet>
+              </v-col>
+              <v-col class="d-flex justify-center align-center">
+                <v-sheet>
+                  <v-chip color="red">
+                    -- kg <v-icon icon="mdi-close" />
+                  </v-chip>
+                </v-sheet>
+              </v-col>
+            </v-row>
+            <v-row class="mt-n4">
+              <v-col class="d-flex justify-center align-center">
+                <v-sheet>Valeur correcte</v-sheet>
+              </v-col>
+              <v-col class="d-flex justify-center align-center">
+                <v-sheet>Valeur plus élevée</v-sheet>
+              </v-col>
+              <v-col class="d-flex justify-center align-center">
+                <v-sheet>Pas d'info sur la valeur</v-sheet>
+              </v-col>
+            </v-row>
           </p>
-          <p class="help-text">
-            Le graphique se base sur les spécialités du coureur selon  <a href="https://www.procyclingstats.com/">PCS</a>. Un coureur avec un score
-            de 100 en montagne n'est pas forcément le meilleur du peloton en montagne mais c'est la spécialité dans
-            laquelle il est le meilleur.<br/>
-            Équivalence des couleurs :<br/>
-            Rouge = + de 15% d'écart (en positif ou négatif)<br/>
-            Orange = Entre 5% et 15% d'écart <br/>
-            Vert = Correct à 5% près<br/>
+          <p class="text-justify">
+            Le graphique se base sur les spécialités du coureur selon <a href="https://www.procyclingstats.com/">PCS</a>. Un coureur avec un score
+            de 100% en montagne n'est pas forcément le meilleur du peloton en montagne mais c'est la spécialité dans
+            laquelle il est le meilleur.
+            <v-row class="mt-0">
+              <v-col class="d-flex justify-center align-center">
+                <v-sheet>
+                  <img src="./assets/help/help_graph_red.png"/>
+                </v-sheet>
+              </v-col>
+              <v-col class="d-flex justify-center align-center">
+                <v-sheet>
+                  <img src="./assets/help/help_graph_orange.png"/>
+                </v-sheet>
+              </v-col>
+              <v-col class="d-flex justify-center align-center">
+                <v-sheet>
+                  <img src="./assets/help/help_graph_green.png"/>
+                </v-sheet>
+              </v-col>
+            </v-row>
+            <v-row class="mt-n4">
+              <v-col class="d-flex justify-center align-center">
+                <v-sheet>Plus de 15% d'écart</v-sheet>
+              </v-col>
+              <v-col class="d-flex justify-center align-center">
+                <v-sheet>5% à 15% d'écart</v-sheet>
+              </v-col>
+              <v-col class="d-flex justify-center align-center">
+                <v-sheet>Correct à 5% près</v-sheet>
+              </v-col>
+            </v-row>
           </p>
         </v-card-text>
       </v-card>

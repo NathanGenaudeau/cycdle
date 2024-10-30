@@ -48,8 +48,8 @@ const shareButtonText = ref<string>('Partager');
  
 const headers = [
   { title: 'Nom', key: 'name', sortable: false, align: 'center' },
-  { title: 'Equipe', key: 'team', sortable: false, align: 'center' },
-  { title: 'Age', key: 'age', sortable: false, align: 'center' },
+  { title: 'Équipe', key: 'team', sortable: false, align: 'center' },
+  { title: 'Âge', key: 'age', sortable: false, align: 'center' },
   { title: 'Nationalité', key: 'nationality', sortable: false, align: 'center' },
   { title: 'Poids / Taille', key: 'measurement', sortable: false, align: 'center' },
   { title: 'Rang UCI', key: 'uci_rank', sortable: false, align: 'center' },
@@ -281,7 +281,7 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
         {{ column.title }}
         <v-tooltip open-on-click>
           <template v-slot:activator="{ props }">
-            <v-icon icon="mdi-information" v-bind="props"></v-icon>
+            <v-icon icon="mdi-information" class="mt-n1" v-bind="props"></v-icon>
           </template>
           <p>Profil du coureur basé sur PCS</p>
           <p>GC: Classement général</p>
@@ -323,7 +323,7 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
       </template>
       <template v-slot:item.uci_rank="{ value }">
         <v-chip :color="getColor(value, 'uci_rank')">
-          {{ value }} <v-icon :icon="getArrow(value, 'uci_rank')" />
+          {{ value === 1 ? `${value}er` : `${value}ème` }} <v-icon :icon="getArrow(value, 'uci_rank')" />
         </v-chip>
       </template>
       <template v-slot:item.win="{ value }">
