@@ -6,18 +6,48 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 Chart.register(...registerables);
 Chart.register(ChartDataLabels);
 
- 
-const riders: any = ref([]);
-const randomRider: any = ref('');
-const guesses: any = ref([]);
-const selectedValue = ref(null);
-const won = ref(false);
-const isDialogActive = ref(false);
+enum teamLevel {
+  WT,
+  PRT
+}
 
-const shareButtonText = ref('Partager');
+interface RiderSpecialities {
+  one_day_races: number;
+  general_classification: number;
+  time_trial: number;
+  sprint: number;
+  climber: number;
+}
+
+interface Rider extends RiderSpecialities {
+  id: string;
+  name: string;
+  photo: string;
+  team: string;
+  teamLevel: teamLevel;
+  age: number;
+  nationality: string;
+  flag: string;
+  weight: number;
+  height: number;
+  uciRank: number;
+  sum_specialities: number;
+  win: number;
+  gt_participation: number;
+  classic_participation: number;
+}
+
+const riders = ref<Rider[]>([]);
+const randomRider = ref<Rider>();
+const guesses = ref<Rider[]>([]);
+const selectedValue = ref<Rider | null>(null);
+const won = ref<boolean>(false);
+const isDialogActive = ref<boolean>(false);
+
+const shareButtonText = ref<string>('Partager');
  
 const headers = [
-  { title: 'Nom', key: 'name', sortable: false, maxWidth: '130px', align: 'center' },
+  { title: 'Nom', key: 'name', sortable: false, align: 'center' },
   { title: 'Equipe', key: 'team', sortable: false, align: 'center' },
   { title: 'Age', key: 'age', sortable: false, align: 'center' },
   { title: 'Nationalité', key: 'nationality', sortable: false, align: 'center' },
@@ -28,11 +58,11 @@ const headers = [
   { title: 'Spécialités', key: 'stats', sortable: false, minWidth: '230px', maxWidth: '230px', align: 'center' }
 ];
  
-let mode: string | null = '';
+const mode= ref<string | null>();
  
 onMounted(async () => {
 
-  mode = localStorage.getItem('mode');
+  mode.value = localStorage.getItem('mode');
   if (localStorage.getItem('lastPlayed') !== new Date().toLocaleDateString()) {
     localStorage.setItem('lastPlayed', new Date().toLocaleDateString());
     localStorage.setItem('guessesWT', JSON.stringify([]));
@@ -40,8 +70,8 @@ onMounted(async () => {
     localStorage.setItem('wonWT', JSON.stringify(false));
     localStorage.setItem('wonPRT', JSON.stringify(false));
   } else {
-    won.value = mode === 'rider-wt' ? JSON.parse(localStorage.getItem('wonWT') as string) : JSON.parse(localStorage.getItem('wonPRT') as string);
-    guesses.value = mode === 'rider-wt' ? JSON.parse(localStorage.getItem('guessesWT') as string) : JSON.parse(localStorage.getItem('guessesPRT') as string);
+    won.value = mode.value === 'rider-wt' ? JSON.parse(localStorage.getItem('wonWT') as string) : JSON.parse(localStorage.getItem('wonPRT') as string);
+    guesses.value = mode.value === 'rider-wt' ? JSON.parse(localStorage.getItem('guessesWT') as string) : JSON.parse(localStorage.getItem('guessesPRT') as string);
   }
   if (won.value) {
     isDialogActive.value = true;
@@ -54,44 +84,47 @@ onMounted(async () => {
 });
 
 const updateRidersList = () => {
-  riders.value = riders.value.filter((rider: any) => {
-    return !guesses.value.find((guess: any) => guess.id === rider.id);
+  riders.value = riders.value.filter((rider: Rider) => {
+    return !guesses.value.find((guess: Rider) => guess.id === rider.id);
   });
 }
  
-const selectRider = (riderSelected: any) => {
-  if (!riderSelected || guesses.value.find((rider: any) => rider.id === riderSelected.id)) return;
+const selectRider = (riderSelected: Rider | null) => {
+  if (!randomRider.value || !riderSelected || guesses.value.find((rider: Rider) => rider.id === riderSelected.id)) return;
   if (riderSelected.id === randomRider.value.id) {
     won.value = true;
     isDialogActive.value = true;
-    if (mode === 'rider-wt') localStorage.setItem('wonWT', JSON.stringify(true))
-    if (mode === 'rider-prt') localStorage.setItem('wonPRT', JSON.stringify(true));
+    if (mode.value === 'rider-wt') localStorage.setItem('wonWT', JSON.stringify(true))
+    if (mode.value === 'rider-prt') localStorage.setItem('wonPRT', JSON.stringify(true));
   }
  
   guesses.value.unshift(riderSelected);
-  if (mode === 'rider-wt') localStorage.setItem('guessesWT', JSON.stringify(guesses.value));
-  if (mode === 'rider-prt') localStorage.setItem('guessesPRT', JSON.stringify(guesses.value));
+  if (mode.value === 'rider-wt') localStorage.setItem('guessesWT', JSON.stringify(guesses.value));
+  if (mode.value === 'rider-prt') localStorage.setItem('guessesPRT', JSON.stringify(guesses.value));
   selectedValue.value = null;
   updateRidersList();
 };
  
 const attributes = ['age', 'team', 'nationality', 'weight', 'height', 'uci_rank', 'win', 'gt_participation', 'classic_participation'];
  
-const getColor = (value: string, type: string) => {
-  if (value !== randomRider.value[type]) return 'red';
+const getColor = (value: any, type: string) => {
+  if (!randomRider.value) return 'red';
+  if (value !== randomRider.value[type as keyof Rider]) return 'red';
   return 'green';
 };
  
-const getArrow = (value: string, type: string) => {
-  if ((parseFloat(value) < parseFloat(randomRider.value[type]) && type !== 'uci_rank') || (parseFloat(value) > parseFloat(randomRider.value[type]) && type === 'uci_rank')) return 'mdi-chevron-up';
-  if ((parseFloat(value) > parseFloat(randomRider.value[type]) && type !== 'uci_rank') || (parseFloat(value) < parseFloat(randomRider.value[type]) && type === 'uci_rank')) return 'mdi-chevron-down';
-  if ((!value || !randomRider.value[type]) && parseFloat(value) !== 0) return 'mdi-close';
+const getArrow = (value: any, type: string) => {
+  if (!randomRider.value) return 'mdi-close';
+  if ((value < randomRider.value[type as keyof Rider] && type !== 'uci_rank') || (value > randomRider.value[type as keyof Rider] && type === 'uci_rank')) return 'mdi-chevron-up';
+  if ((value > randomRider.value[type as keyof Rider] && type !== 'uci_rank') || (value < randomRider.value[type as keyof Rider] && type === 'uci_rank')) return 'mdi-chevron-down';
+  if ((!value || !randomRider.value[type as keyof Rider]) && value !== 0) return 'mdi-close';
   return 'mdi-check';
 };
  
 const barChartColors = (value: number, type: string) => {
-  if (value - 5 <= randomRider.value[type] && value + 5 >= randomRider.value[type]) return 'green';
-  else if (value - 15 <= randomRider.value[type] && value + 15 >= randomRider.value[type]) return 'orange';
+  if (!randomRider.value) return 'red';
+  if (value - 5 <= randomRider.value[type as keyof RiderSpecialities] && value + 5 >= randomRider.value[type as keyof RiderSpecialities]) return 'green';
+  else if (value - 15 <= randomRider.value[type as keyof RiderSpecialities] && value + 15 >= randomRider.value[type as keyof RiderSpecialities]) return 'orange';
   else return 'red';
 };
 
@@ -118,31 +151,33 @@ const options = {
       anchor: 'end',
       align: 'end',
       offset: (context: any) => {
+        if (!randomRider.value) return;
         switch(context.chart.data.labels[context.dataIndex]) {
           case 'GC':
-            return labelPositionning(randomRider.value['general_classification'], context.dataset.data[context.dataIndex]);
+            return labelPositionning(randomRider.value.general_classification, context.dataset.data[context.dataIndex]);
           case 'MON':
-            return labelPositionning(randomRider.value['climber'], context.dataset.data[context.dataIndex]);
+            return labelPositionning(randomRider.value.climber, context.dataset.data[context.dataIndex]);
           case 'SPR':
-            return labelPositionning(randomRider.value['sprint'], context.dataset.data[context.dataIndex]);
+            return labelPositionning(randomRider.value.sprint, context.dataset.data[context.dataIndex]);
           case 'CLA':
-            return labelPositionning(randomRider.value['one_day_races'], context.dataset.data[context.dataIndex]);
+            return labelPositionning(randomRider.value.one_day_races, context.dataset.data[context.dataIndex]);
           case 'CLM':
-            return labelPositionning(randomRider.value['time_trial'], context.dataset.data[context.dataIndex]);
+            return labelPositionning(randomRider.value.time_trial, context.dataset.data[context.dataIndex]);
         }
       },
       formatter: (val: any, context: any) => {
+        if (!randomRider.value) return;
         switch(context.chart.data.labels[context.dataIndex]) {
           case 'GC':
-            return compareGraph(randomRider.value['general_classification'], val);
+            return compareGraph(randomRider.value.general_classification, val);
           case 'MON':
-            return compareGraph(randomRider.value['climber'], val);
+            return compareGraph(randomRider.value.climber, val);
           case 'SPR':
-            return compareGraph(randomRider.value['sprint'], val);
+            return compareGraph(randomRider.value.sprint, val);
           case 'CLA':
-            return compareGraph(randomRider.value['one_day_races'], val);
+            return compareGraph(randomRider.value.one_day_races, val);
           case 'CLM':
-            return compareGraph(randomRider.value['time_trial'], val);
+            return compareGraph(randomRider.value.time_trial, val);
         }
       }
     },
@@ -169,7 +204,7 @@ const options = {
   }
 };
  
-const formatRiderSpecialities = (rider: any) => {
+const formatRiderSpecialities = (rider: Rider) => {
   return {
     labels: ['GC', 'MON', 'SPR', 'CLA', 'CLM'],
     datasets: [{
@@ -188,12 +223,12 @@ const formatRiderSpecialities = (rider: any) => {
 const saveToClipboard = () => {
   const firstDate = new Date('2024-10-10');
   const nb = Math.floor((new Date().getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24));
-  let textToShare = `Cycdle (@Cycdle) ${mode === 'rider-wt' ? 'WT' : 'PRT'}#${nb} - ${guesses.value.length} essais\n`;
+  let textToShare = `Cycdle (@Cycdle) ${mode.value === 'rider-wt' ? 'WT' : 'PRT'}#${nb} - ${guesses.value.length} essais\n`;
  
   for (const guess of guesses.value.slice().reverse()) {
     for (const key of Object.keys(guess)) {
       if (attributes.includes(key)) {
-        textToShare += getColor(guess[key], key) === 'green' ? '🟩' : '🟥';
+        textToShare += getColor(guess[key as keyof Rider], key) === 'green' ? '🟩' : '🟥';
       }
     }
     textToShare += '\n';
@@ -222,26 +257,26 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
       v-model="selectedValue" @update:model-value="selectRider(selectedValue)" placeholder="Entrez le nom d'un coureur"
       variant="outlined" :disabled="won" color="#0a74da" base-color="#0a74da" hide-no-data>
       <template v-slot:chip="{ item }">
-        {{ (item as any).raw.name }}
+        {{ item.raw.name }}
       </template>
       <template v-slot:item="{ props, item }" >
         <v-list-item
           v-bind="props"
-          :title="(item as any).raw.name"
+          :title="item.raw.name"
         >
           <template v-slot:prepend>
             <v-avatar rounded="0" size="60">
-              <v-img class="mb-n6" :src="(item as any).raw.photo" max-width="40px" style="clip-path: inset(0 0 20px 0 round 100px);"/>
+              <v-img class="mb-n6" :src="item.raw.photo" max-width="40px" style="clip-path: inset(0 0 20px 0 round 100px);"/>
             </v-avatar>
           </template>
           <template v-slot:append>
-            <v-icon :icon="`fi fi-${(item as any).raw.flag}`"/>
+            <v-icon :icon="`fi fi-${item.raw.flag}`"/>
           </template>
         </v-list-item>
       </template>
     </v-autocomplete>
  
-    <v-data-table :items="guesses" :headers="headers as any" hide-no-data>
+    <v-data-table :items="guesses" :headers="headers" hide-no-data items-per-page="-1">
       <template v-slot:header.stats="{ column }">
         {{ column.title }}
         <v-tooltip open-on-click>
@@ -258,9 +293,9 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
       </template>
       <template v-slot:item.name="{ item }">
         <v-avatar rounded="0" size="120">
-          <v-img :src="(item as any).photo" max-width="80px" style="clip-path: inset(0 0 40px 0 round 100px);"/>
+          <v-img :src="item.photo" max-width="80px" style="clip-path: inset(0 0 40px 0 round 100px);"/>
         </v-avatar>
-        <div class="mt-n8">{{ (item as any).name }}</div>
+        <div class="mt-n8">{{ item.name.split(' ').splice(0, 2).join(' ') }} <br /> {{ item.name.split(' ').splice(2).join(' ') }}</div>
       </template>
       <template v-slot:item.team="{ value }">
         <v-chip :color="getColor(value, 'team')">
@@ -273,17 +308,17 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
         </v-chip>
       </template>
       <template v-slot:item.nationality="{ item }">
-        <v-chip :color="getColor((item as any).nationality, 'nationality')" :prepend-icon="`fi fi-${(item as any).flag}`">
-          {{ (item as any).nationality }}
+        <v-chip :color="getColor(item.nationality, 'nationality')" :prepend-icon="`fi fi-${item.flag}`">
+          {{ item.nationality }}
         </v-chip>
       </template>
       <template v-slot:item.measurement="{ item }">
-        <v-chip :color="getColor((item as any).weight, 'weight')">
-          {{ (item as any).weight || '-- ' }}kg <v-icon :icon="getArrow((item as any).weight, 'weight')" />
+        <v-chip :color="getColor(item.weight, 'weight')">
+          {{ item.weight || '-- ' }}kg <v-icon :icon="getArrow(item.weight, 'weight')" />
         </v-chip>
         <v-divider inset thickness="5" color="transparent" />
-        <v-chip :color="getColor((item as any).height, 'height')">
-          {{ (item as any).height || '-- ' }}m <v-icon :icon="getArrow((item as any).height, 'height')" />
+        <v-chip :color="getColor(item.height, 'height')">
+          {{ item.height || '-- ' }}m <v-icon :icon="getArrow(item.height, 'height')" />
         </v-chip>
       </template>
       <template v-slot:item.uci_rank="{ value }">
@@ -297,13 +332,13 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
         </v-chip>
       </template>
       <template v-slot:item.partGTClassic="{ item }">
-        <v-chip :color="getColor((item as any).gt_participation, 'gt_participation')">
-          {{ (item as any).gt_participation }} <v-icon :icon="getArrow((item as any).gt_participation, 'gt_participation')" />
+        <v-chip :color="getColor(item.gt_participation, 'gt_participation')">
+          {{ item.gt_participation }} <v-icon :icon="getArrow(item.gt_participation, 'gt_participation')" />
         </v-chip>
         <v-divider inset thickness="5" color="transparent" />
-        <v-chip :color="getColor((item as any).classic_participation, 'classic_participation')">
-          {{ (item as any).classic_participation }} <v-icon
-            :icon="getArrow((item as any).classic_participation, 'classic_participation')" />
+        <v-chip :color="getColor(item.classic_participation, 'classic_participation')">
+          {{ item.classic_participation }} <v-icon
+            :icon="getArrow(item.classic_participation, 'classic_participation')" />
         </v-chip>
       </template>
       <template v-slot:item.stats="{ item }">
@@ -327,7 +362,7 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
             <div class="pixels">
               <div v-for="guess in guesses.slice().reverse()" :key="guess.id">
                 <span v-for="key of Object.keys(guess)" :key="key">
-                  <v-icon v-if="attributes.includes(key)" icon="mdi mdi-square" :color="getColor(guess[key], key)" />
+                  <v-icon v-if="attributes.includes(key)" icon="mdi mdi-square" :color="getColor(guess[key as keyof Rider], key)" />
                 </span>
               </div>
             </div>
