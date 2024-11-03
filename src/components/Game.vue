@@ -77,10 +77,10 @@ onMounted(async () => {
     isDialogActive.value = true;
 
   }
-  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/riders?mode=${mode}`);
+  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/riders?mode=${mode.value}`);
   riders.value = await response.json();
   updateRidersList();
-  randomRider.value = (await (await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/riders/random?mode=${mode}`)).json())[0];
+  randomRider.value = (await (await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/riders/random?mode=${mode.value}`)).json())[0];
 });
 
 const updateRidersList = () => {
