@@ -1,14 +1,28 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
+import { ref, watch, onMounted } from 'vue';
  
 import logo from './assets/logo/cycdle-white.png';
-import { useRouter } from 'vue-router';
-import { ref } from 'vue';
+import fr from './assets/lang/fr.json';
+import en from './assets/lang/en.json';
  
 const router = useRouter();
  
 const isHelpDialogActive = ref(false);
 const isCreditDialogActive = ref(false);
- 
+
+const lang = ref(localStorage.getItem('lang') || 'fr');
+const langFile = ref(localStorage.getItem('lang') === 'fr' ? fr : en);
+
+onMounted(async () => {
+  if (!localStorage.getItem('lang')) localStorage.setItem('lang', 'fr');
+});
+
+watch(lang, () => {
+  localStorage.setItem('lang', lang.value);
+  langFile.value = lang.value === 'fr' ? fr : en;
+});
+
 </script>
  
 <template>
@@ -19,25 +33,24 @@ const isCreditDialogActive = ref(false);
       </v-app-bar-title>
       <v-btn icon="mdi-help" @click="isHelpDialogActive = true"></v-btn>
       <v-btn icon="mdi-link-variant" @click="isCreditDialogActive = true"></v-btn>
+      <v-btn icon="fi fi-fr" @click="lang = 'fr'"></v-btn>
+      <v-btn icon="fi fi-gb" @click="lang = 'en'"></v-btn>
     </v-app-bar>
  
     <v-main class="d-flex align-center justify-center" style="min-height: 100%;">
-      <RouterView></RouterView>
+      <RouterView :lang />
     </v-main>
   </v-layout>
   <v-dialog max-width="500" v-model="isHelpDialogActive">
     <template v-slot:default="{ isActive }">
       <v-card>
         <v-card-title class="d-flex justify-space-between align-center">
-          <div class="text-h5 ps-2">Comment jouer ?</div>
+          <div class="text-h5 ps-2">{{ langFile.app_modal_how_to_play_title }}</div>
           <v-btn icon="mdi-close" variant="text" @click="isActive.value = false"></v-btn>
         </v-card-title>
         <v-card-text class="modal-text">
           <p class="text-justify">
-            Chaque jour, un coureur aléatoire (encore en activité) est choisi parmi les X premiers du classement UCI.
-            Le but est de le trouver avec le moins d'essais possible.<br/>
-            À chaque essai, les informations du coureur que vous avez sélectionné donnerons des indications sur le coureur
-            recherché.
+            {{ langFile.app_modal_how_to_play_text_1 }}
             <v-row class="mt-0">
               <v-col class="d-flex justify-center align-center">
                 <v-sheet>
@@ -63,20 +76,18 @@ const isCreditDialogActive = ref(false);
             </v-row>
             <v-row class="mt-n4">
               <v-col class="d-flex justify-center align-center">
-                <v-sheet>Valeur correcte</v-sheet>
+                <v-sheet>{{ langFile.app_modal_how_to_play_legend_1_1 }}</v-sheet>
               </v-col>
               <v-col class="d-flex justify-center align-center">
-                <v-sheet>Valeur plus élevée</v-sheet>
+                <v-sheet>{{ langFile.app_modal_how_to_play_legend_1_2 }}</v-sheet>
               </v-col>
               <v-col class="d-flex justify-center align-center">
-                <v-sheet>Pas d'info sur la valeur</v-sheet>
+                <v-sheet>{{ langFile.app_modal_how_to_play_legend_1_3 }}</v-sheet>
               </v-col>
             </v-row>
           </p>
           <p class="text-justify">
-            Le graphique se base sur les spécialités du coureur selon <a href="https://www.procyclingstats.com/">PCS</a>. Un coureur avec un score
-            de 100% en montagne n'est pas forcément le meilleur du peloton en montagne mais c'est la spécialité dans
-            laquelle il est le meilleur.
+            <span v-html="langFile.app_modal_how_to_play_text_2" ></span>
             <v-row class="mt-0">
               <v-col class="d-flex justify-center align-center">
                 <v-sheet>
@@ -96,13 +107,13 @@ const isCreditDialogActive = ref(false);
             </v-row>
             <v-row class="mt-n4">
               <v-col class="d-flex justify-center align-center">
-                <v-sheet>Plus de 15% d'écart</v-sheet>
+                <v-sheet>{{ langFile.app_modal_how_to_play_legend_2_1 }}</v-sheet>
               </v-col>
               <v-col class="d-flex justify-center align-center">
-                <v-sheet>5% à 15% d'écart</v-sheet>
+                <v-sheet>{{ langFile.app_modal_how_to_play_legend_2_2 }}</v-sheet>
               </v-col>
               <v-col class="d-flex justify-center align-center">
-                <v-sheet>Correct à 5% près</v-sheet>
+                <v-sheet>{{ langFile.app_modal_how_to_play_legend_2_3 }}</v-sheet>
               </v-col>
             </v-row>
           </p>
@@ -114,15 +125,15 @@ const isCreditDialogActive = ref(false);
     <template v-slot:default="{ isActive }">
       <v-card>
         <v-card-title class="d-flex justify-space-between align-center">
-          <div class="text-h5 ps-2">Crédits</div>
+          <div class="text-h5 ps-2">{{ langFile.app_modal_credits_title }}</div>
           <v-btn icon="mdi-close" variant="text" @click="isActive.value = false"></v-btn>
         </v-card-title>
         <v-card-text class="modal-text">
-          <div>Jeu développé par <a href="https://x.com/enilkaNrM">@enilkaNrM</a></div>
-          <div>Les données sont tirées du site <a href="https://www.procyclingstats.com/">ProCyclingStats</a></div>
-          <div>Cycdle est un projet <a href="https://github.com/NathanGenaudeau/cycdle">open source</a></div>
-          <div>Jeu inspiré par <a href="https://wordle.louan.me/">Wordle FR</a></div>
-          <div>Projet réalisé avec l'aide de <a href="https://x.com/SwanRoyer">@SwanRoyer</a></div>
+          <div v-html="langFile.app_modal_credits_text_1" ></div>
+          <div v-html="langFile.app_modal_credits_text_2" ></div>
+          <div v-html="langFile.app_modal_credits_text_3" ></div>
+          <div v-html="langFile.app_modal_credits_text_4" ></div>
+          <div v-html="langFile.app_modal_credits_text_5" ></div>
         </v-card-text>
       </v-card>
     </template>

@@ -1,10 +1,21 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { BarChart } from 'vue-chart-3';
 import { Chart, registerables } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 Chart.register(...registerables);
 Chart.register(ChartDataLabels);
+
+import fr from '../assets/lang/fr.json';
+import en from '../assets/lang/en.json';
+
+const props = defineProps({ lang: String});
+const langFile = ref(localStorage.getItem('lang') === 'fr' ? fr : en);
+
+watch(() => props.lang, () => {
+  langFile.value = props.lang === 'fr' ? fr : en;
+  headers = props.lang === 'fr' ? headerFR : headerEN;
+});
 
 enum teamLevel {
   WT,
@@ -12,11 +23,12 @@ enum teamLevel {
 }
 
 interface RiderSpecialities {
-  one_day_races: number;
   general_classification: number;
-  time_trial: number;
-  sprint: number;
   climber: number;
+  hills: number;
+  one_day_races: number;
+  sprint: number;
+  time_trial: number;
 }
 
 interface Rider extends RiderSpecialities {
@@ -44,19 +56,32 @@ const selectedValue = ref<Rider | null>(null);
 const won = ref<boolean>(false);
 const isDialogActive = ref<boolean>(false);
 
-const shareButtonText = ref<string>('Partager');
- 
-const headers = [
-  { title: 'Nom', key: 'name', sortable: false, align: 'center' },
-  { title: 'Équipe', key: 'team', sortable: false, align: 'center' },
-  { title: 'Âge', key: 'age', sortable: false, align: 'center' },
-  { title: 'Nationalité', key: 'nationality', sortable: false, align: 'center' },
-  { title: 'Poids / Taille', key: 'measurement', sortable: false, align: 'center' },
-  { title: 'Rang UCI', key: 'uci_rank', sortable: false, align: 'center' },
-  { title: 'Victoire', key: 'win', sortable: false, align: 'center' },
-  { title: 'Grand Tour / Classique', key: 'partGTClassic', sortable: false, align: 'center' },
-  { title: 'Spécialités', key: 'stats', sortable: false, minWidth: '230px', maxWidth: '230px', align: 'center' }
+const shareButtonText = ref<string>(langFile.value.game_modal_win_button_share);
+
+const headerFR = [
+  { title: fr.game_datatable_header_name, key: 'name', sortable: false, align: 'center' },
+  { title: fr.game_datatable_header_team, key: 'team', sortable: false, align: 'center' },
+  { title: fr.game_datatable_header_age, key: 'age', sortable: false, align: 'center' },
+  { title: fr.game_datatable_header_nationality, key: 'nationality', sortable: false, align: 'center' },
+  { title: fr.game_datatable_header_weight_height, key: 'measurement', sortable: false, align: 'center' },
+  { title: fr.game_datatable_header_uci_rank, key: 'uci_rank', sortable: false, align: 'center' },
+  { title: fr.game_datatable_header_win, key: 'win', sortable: false, align: 'center' },
+  { title: fr.game_datatable_header_gt_classic, key: 'partGTClassic', sortable: false, align: 'center' },
+  { title: fr.game_datatable_header_specialties, key: 'stats', sortable: false, minWidth: '230px', maxWidth: '230px', align: 'center' }
 ];
+const headerEN = [
+  { title: en.game_datatable_header_name, key: 'name', sortable: false, align: 'center' },
+  { title: en.game_datatable_header_team, key: 'team', sortable: false, align: 'center' },
+  { title: en.game_datatable_header_age, key: 'age', sortable: false, align: 'center' },
+  { title: en.game_datatable_header_nationality, key: 'nationality', sortable: false, align: 'center' },
+  { title: en.game_datatable_header_weight_height, key: 'measurement', sortable: false, align: 'center' },
+  { title: en.game_datatable_header_uci_rank, key: 'uci_rank', sortable: false, align: 'center' },
+  { title: en.game_datatable_header_win, key: 'win', sortable: false, align: 'center' },
+  { title: en.game_datatable_header_gt_classic, key: 'partGTClassic', sortable: false, align: 'center' },
+  { title: en.game_datatable_header_specialties, key: 'stats', sortable: false, minWidth: '230px', maxWidth: '230px', align: 'center' }
+];
+
+let headers = props.lang === 'en' ? headerEN : headerFR;
  
 const mode= ref<string | null>();
  
@@ -106,14 +131,15 @@ const selectRider = (riderSelected: Rider | null) => {
 };
  
 const attributes = ['age', 'team', 'nationality', 'weight', 'height', 'uci_rank', 'win', 'gt_participation', 'classic_participation'];
+const specialities = ['one_day_races', 'general_classification', 'time_trial', 'sprint', 'climber', 'hills'];
  
-const getColor = (value: any, type: string) => {
+const getAttributeColor = (value: any, type: string) => {
   if (!randomRider.value) return 'red';
   if (value !== randomRider.value[type as keyof Rider]) return 'red';
   return 'green';
 };
  
-const getArrow = (value: any, type: string) => {
+const getAttributeArrow = (value: any, type: string) => {
   if (!randomRider.value) return 'mdi-close';
   if ((value < randomRider.value[type as keyof Rider] && type !== 'uci_rank') || (value > randomRider.value[type as keyof Rider] && type === 'uci_rank')) return 'mdi-chevron-up';
   if ((value > randomRider.value[type as keyof Rider] && type !== 'uci_rank') || (value < randomRider.value[type as keyof Rider] && type === 'uci_rank')) return 'mdi-chevron-down';
@@ -121,7 +147,7 @@ const getArrow = (value: any, type: string) => {
   return 'mdi-check';
 };
  
-const barChartColors = (value: number, type: string) => {
+const getSpecialityColor = (value: any, type: string) => {
   if (!randomRider.value) return 'red';
   if (value - 5 <= randomRider.value[type as keyof RiderSpecialities] && value + 5 >= randomRider.value[type as keyof RiderSpecialities]) return 'green';
   else if (value - 15 <= randomRider.value[type as keyof RiderSpecialities] && value + 15 >= randomRider.value[type as keyof RiderSpecialities]) return 'orange';
@@ -153,31 +179,35 @@ const options = {
       offset: (context: any) => {
         if (!randomRider.value) return;
         switch(context.chart.data.labels[context.dataIndex]) {
+          case 'ONE':
+            return labelPositionning(randomRider.value.one_day_races, context.dataset.data[context.dataIndex]);
           case 'GC':
             return labelPositionning(randomRider.value.general_classification, context.dataset.data[context.dataIndex]);
-          case 'MON':
-            return labelPositionning(randomRider.value.climber, context.dataset.data[context.dataIndex]);
+          case 'TT':
+            return labelPositionning(randomRider.value.time_trial, context.dataset.data[context.dataIndex]);
           case 'SPR':
             return labelPositionning(randomRider.value.sprint, context.dataset.data[context.dataIndex]);
-          case 'CLA':
-            return labelPositionning(randomRider.value.one_day_races, context.dataset.data[context.dataIndex]);
-          case 'CLM':
-            return labelPositionning(randomRider.value.time_trial, context.dataset.data[context.dataIndex]);
+          case 'CLI':
+            return labelPositionning(randomRider.value.climber, context.dataset.data[context.dataIndex]);
+          case 'HIL':
+            return labelPositionning(randomRider.value.hills, context.dataset.data[context.dataIndex]);
         }
       },
       formatter: (val: any, context: any) => {
         if (!randomRider.value) return;
         switch(context.chart.data.labels[context.dataIndex]) {
+          case 'ONE':
+            return compareGraph(randomRider.value.one_day_races, val);
           case 'GC':
             return compareGraph(randomRider.value.general_classification, val);
-          case 'MON':
-            return compareGraph(randomRider.value.climber, val);
+          case 'TT':
+            return compareGraph(randomRider.value.time_trial, val);
           case 'SPR':
             return compareGraph(randomRider.value.sprint, val);
-          case 'CLA':
-            return compareGraph(randomRider.value.one_day_races, val);
-          case 'CLM':
-            return compareGraph(randomRider.value.time_trial, val);
+          case 'CLI':
+            return compareGraph(randomRider.value.climber, val);
+          case 'HIL':
+            return compareGraph(randomRider.value.hills, val);
         }
       }
     },
@@ -206,15 +236,16 @@ const options = {
  
 const formatRiderSpecialities = (rider: Rider) => {
   return {
-    labels: ['GC', 'MON', 'SPR', 'CLA', 'CLM'],
+    labels: ['ONE', 'GC', 'TT', 'SPR', 'CLI', 'HIL'],
     datasets: [{
-      data: [rider.general_classification, rider.climber, rider.sprint, rider.one_day_races, rider.time_trial],
+      data: [rider.one_day_races, rider.general_classification, rider.time_trial, rider.sprint, rider.climber, rider.hills],
       backgroundColor: [
-        barChartColors(rider.general_classification, 'general_classification'),
-        barChartColors(rider.climber, 'climber'),
-        barChartColors(rider.sprint, 'sprint'),
-        barChartColors(rider.one_day_races, 'one_day_races'),
-        barChartColors(rider.time_trial, 'time_trial')
+        getSpecialityColor(rider.one_day_races, 'one_day_races'),
+        getSpecialityColor(rider.general_classification, 'general_classification'),
+        getSpecialityColor(rider.time_trial, 'time_trial'),
+        getSpecialityColor(rider.sprint, 'sprint'),
+        getSpecialityColor(rider.climber, 'climber'),
+        getSpecialityColor(rider.hills, 'hills')
       ]
     }]
   };
@@ -223,12 +254,14 @@ const formatRiderSpecialities = (rider: Rider) => {
 const saveToClipboard = () => {
   const firstDate = new Date('2024-10-10');
   const nb = Math.floor((new Date().getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24));
-  let textToShare = `Cycdle (@Cycdle) ${mode.value === 'rider-wt' ? 'WT' : 'PRT'}#${nb} - ${guesses.value.length} essais\n`;
+  let textToShare = `Cycdle (@Cycdle) ${mode.value === 'rider-wt' ? 'WT' : 'PRT'}#${nb} - ${guesses.value.length} ${langFile.value.game_modal_win_text_share_try}\n`;
  
   for (const guess of guesses.value.slice().reverse()) {
     for (const key of Object.keys(guess)) {
       if (attributes.includes(key)) {
-        textToShare += getColor(guess[key as keyof Rider], key) === 'green' ? '🟩' : '🟥';
+        textToShare += getAttributeColor(guess[key as keyof Rider], key) === 'green' ? '🟩' : '🟥';
+      } else if (specialities.includes(key)) {
+        textToShare += getSpecialityColor(guess[key as keyof Rider], key) === 'green' ? '🟩' : getSpecialityColor(guess[key as keyof Rider], key) === 'orange' ? '🟧' : '🟥';
       }
     }
     textToShare += '\n';
@@ -237,9 +270,9 @@ const saveToClipboard = () => {
  
   navigator.clipboard.writeText(textToShare).then(
     function () {
-      shareButtonText.value = 'Copié';
+      shareButtonText.value = langFile.value.game_modal_win_button_copy;
       setTimeout(() => {
-        shareButtonText.value = 'Partager';
+        shareButtonText.value = langFile.value.game_modal_win_button_share;
       }, 2000);
     },
   );
@@ -253,8 +286,8 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
  
 <template>
   <div class="game d-block flex-column align-center justify-center">
-    <v-autocomplete label="Rechercher un cycliste" :items="riders" :custom-filter="customFilter"
-      v-model="selectedValue" @update:model-value="selectRider(selectedValue)" placeholder="Entrez le nom d'un coureur"
+    <v-autocomplete :label="langFile.game_autocomplete_label" :items="riders" :custom-filter="customFilter"
+      v-model="selectedValue" @update:model-value="selectRider(selectedValue)" :placeholder="langFile.game_autocomplete_placeholder"
       variant="outlined" :disabled="won" color="#0a74da" base-color="#0a74da" hide-no-data>
       <template v-slot:chip="{ item }">
         {{ item.raw.name }}
@@ -283,12 +316,13 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
           <template v-slot:activator="{ props }">
             <v-icon icon="mdi-information" class="mt-n1" v-bind="props"></v-icon>
           </template>
-          <p>Profil du coureur basé sur PCS</p>
-          <p>GC: Classement général</p>
-          <p>MON: Grimpeur</p>
-          <p>SPR: Sprinteur</p>
-          <p>CLA: Classique</p>
-          <p>CLM: Contre-la-montre</p>
+          <p>{{ langFile.game_datatable_tooltip_specialties_text }}</p>
+          <p>ONE: {{ langFile.game_datatable_tooltip_specialties_one }}</p>
+          <p>GC: {{ langFile.game_datatable_tooltip_specialties_gc }}</p>
+          <p>TT: {{ langFile.game_datatable_tooltip_specialties_tt }}</p>
+          <p>SPR: {{ langFile.game_datatable_tooltip_specialties_spr }}</p>
+          <p>CLI: {{ langFile.game_datatable_tooltip_specialties_cli }}</p>
+          <p>HIL: {{ langFile.game_datatable_tooltip_specialties_hil }}</p>
         </v-tooltip>
       </template>
       <template v-slot:item.name="{ item }">
@@ -298,47 +332,47 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
         <div class="mt-n8">{{ item.name.split(' ').splice(0, 2).join(' ') }} <br /> {{ item.name.split(' ').splice(2).join(' ') }}</div>
       </template>
       <template v-slot:item.team="{ value }">
-        <v-chip :color="getColor(value, 'team')">
+        <v-chip :color="getAttributeColor(value, 'team')">
           {{ value.split(' ').splice(0, 2).join(' ') }} <br /> {{ value.split(' ').splice(2).join(' ') }}
         </v-chip>
       </template>
       <template v-slot:item.age="{ value }">
-        <v-chip :color="getColor(value, 'age')">
-          {{ value }} <v-icon :icon="getArrow(value, 'age')" />
+        <v-chip :color="getAttributeColor(value, 'age')">
+          {{ value }} <v-icon :icon="getAttributeArrow(value, 'age')" />
         </v-chip>
       </template>
       <template v-slot:item.nationality="{ item }">
-        <v-chip :color="getColor(item.nationality, 'nationality')" :prepend-icon="`fi fi-${item.flag}`">
+        <v-chip :color="getAttributeColor(item.nationality, 'nationality')" :prepend-icon="`fi fi-${item.flag}`">
           {{ item.nationality }}
         </v-chip>
       </template>
       <template v-slot:item.measurement="{ item }">
-        <v-chip :color="getColor(item.weight, 'weight')">
-          {{ item.weight || '-- ' }}kg <v-icon :icon="getArrow(item.weight, 'weight')" />
+        <v-chip :color="getAttributeColor(item.weight, 'weight')">
+          {{ item.weight || '-- ' }}kg <v-icon :icon="getAttributeArrow(item.weight, 'weight')" />
         </v-chip>
         <v-divider inset thickness="5" color="transparent" />
-        <v-chip :color="getColor(item.height, 'height')">
-          {{ item.height || '-- ' }}m <v-icon :icon="getArrow(item.height, 'height')" />
+        <v-chip :color="getAttributeColor(item.height, 'height')">
+          {{ item.height || '-- ' }}m <v-icon :icon="getAttributeArrow(item.height, 'height')" />
         </v-chip>
       </template>
       <template v-slot:item.uci_rank="{ value }">
-        <v-chip :color="getColor(value, 'uci_rank')">
-          {{ value === 1 ? `${value}er` : `${value}ème` }} <v-icon :icon="getArrow(value, 'uci_rank')" />
+        <v-chip :color="getAttributeColor(value, 'uci_rank')">
+          {{ value === 1 ? `${value}er` : `${value}ème` }} <v-icon :icon="getAttributeArrow(value, 'uci_rank')" />
         </v-chip>
       </template>
       <template v-slot:item.win="{ value }">
-        <v-chip :color="getColor(value, 'win')">
-          {{ value }} <v-icon :icon="getArrow(value, 'win')" />
+        <v-chip :color="getAttributeColor(value, 'win')">
+          {{ value }} <v-icon :icon="getAttributeArrow(value, 'win')" />
         </v-chip>
       </template>
       <template v-slot:item.partGTClassic="{ item }">
-        <v-chip :color="getColor(item.gt_participation, 'gt_participation')">
-          {{ item.gt_participation }} <v-icon :icon="getArrow(item.gt_participation, 'gt_participation')" />
+        <v-chip :color="getAttributeColor(item.gt_participation, 'gt_participation')">
+          {{ item.gt_participation }} <v-icon :icon="getAttributeArrow(item.gt_participation, 'gt_participation')" />
         </v-chip>
         <v-divider inset thickness="5" color="transparent" />
-        <v-chip :color="getColor(item.classic_participation, 'classic_participation')">
+        <v-chip :color="getAttributeColor(item.classic_participation, 'classic_participation')">
           {{ item.classic_participation }} <v-icon
-            :icon="getArrow(item.classic_participation, 'classic_participation')" />
+            :icon="getAttributeArrow(item.classic_participation, 'classic_participation')" />
         </v-chip>
       </template>
       <template v-slot:item.stats="{ item }">
@@ -352,17 +386,16 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
       <template v-slot:default="{ isActive }">
         <v-card>
           <v-card-title class="d-flex justify-space-between align-center">
-            <div class="text-h5 text-medium-emphasis ps-2">Félicitations !</div>
+            <div class="text-h5 text-medium-emphasis ps-2">{{ langFile.game_modal_win_title }}</div>
             <v-btn icon="mdi-close" variant="text" @click="isActive.value = false" />
           </v-card-title>
           <v-card-text>
-            <div>
-              Bravo, vous avez trouvé le coureur du jour ! Partagez votre score à vos amis pour qu'ils essaient de le battre.
-            </div>
+            <div>{{ langFile.game_modal_win_text }}</div>
             <div class="pixels">
               <div v-for="guess in guesses.slice().reverse()" :key="guess.id">
                 <span v-for="key of Object.keys(guess)" :key="key">
-                  <v-icon v-if="attributes.includes(key)" icon="mdi mdi-square" :color="getColor(guess[key as keyof Rider], key)" />
+                  <v-icon v-if="attributes.includes(key)" icon="mdi mdi-square" :color="getAttributeColor(guess[key as keyof Rider], key)" />
+                  <v-icon v-else-if="specialities.includes(key)" icon="mdi mdi-square" :color="getSpecialityColor(guess[key as keyof Rider], key)" />
                 </span>
               </div>
             </div>
