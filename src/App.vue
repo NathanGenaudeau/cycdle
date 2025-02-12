@@ -26,18 +26,29 @@ watch(lang, () => {
 </script>
  
 <template>
-  <v-layout class="app rounded rounded-md" style="height: 100vh;">
+  <v-layout class="app rounded rounded-md">
     <v-app-bar>
       <v-app-bar-title>
         <v-img :src="logo" class="logo" @click="router.push('/')" />
       </v-app-bar-title>
       <v-btn icon="mdi-help" @click="isHelpDialogActive = true"></v-btn>
       <v-btn icon="mdi-link-variant" @click="isCreditDialogActive = true"></v-btn>
-      <v-btn icon="fi fi-fr" @click="lang = 'fr'"></v-btn>
-      <v-btn icon="fi fi-gb" @click="lang = 'en'"></v-btn>
+      <v-menu>
+        <template v-slot:activator="{ props }">
+          <v-btn icon="mdi-translate" v-bind="props"></v-btn>
+        </template>
+        <v-list>
+          <v-list-item>
+            <v-btn icon="fi fi-fr" @click="lang = 'fr'"></v-btn>
+          </v-list-item>
+          <v-list-item>
+            <v-btn icon="fi fi-gb" @click="lang = 'en'"></v-btn>
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </v-app-bar>
  
-    <v-main class="d-flex align-center justify-center" style="min-height: 100%;">
+    <v-main class="d-flex align-center justify-center">
       <RouterView :lang />
     </v-main>
   </v-layout>

@@ -299,7 +299,7 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
         >
           <template v-slot:prepend>
             <v-avatar rounded="0" size="60">
-              <v-img class="mb-n6" :src="item.raw.photo" max-width="40px" style="clip-path: inset(0 0 20px 0 round 100px);"/>
+              <v-img class="mb-n6" :src="item.raw.photo" max-width="40px" id="avatar-img-autocomplete" />
             </v-avatar>
           </template>
           <template v-slot:append>
@@ -327,7 +327,7 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
       </template>
       <template v-slot:item.name="{ item }">
         <v-avatar rounded="0" size="120">
-          <v-img :src="item.photo" max-width="80px" style="clip-path: inset(0 0 40px 0 round 100px);"/>
+          <v-img :src="item.photo" max-width="80px" id="avatar-img-datatable" />
         </v-avatar>
         <div class="mt-n8">{{ item.name.split(' ').splice(0, 2).join(' ') }} <br /> {{ item.name.split(' ').splice(2).join(' ') }}</div>
       </template>

@@ -1,6 +1,10 @@
-.logo {
-  cursor: pointer;
-  max-width: 140px!important;
+.app {
+  height: 100vh;
+  
+  .logo {
+    cursor: pointer;
+    max-width: 140px!important;
+  }
 }
 
 .home {
@@ -8,6 +12,7 @@
 
   button {
     width: 100%;
+    font-weight: 600;
   }
 }
 
@@ -15,6 +20,15 @@
   position: absolute;
   top: 20%;
   width: 85%;
+  
+  #avatar-img-autocomplete {
+    clip-path: inset(0 0 20px 0 round 100px);
+  }
+
+  #avatar-img-datatable {
+    clip-path: inset(0 0 40px 0 round 100px);
+  }
+
 }
 
 .modal-text {
@@ -35,11 +49,10 @@
   }
 }
 
-.recap {
-  text-align: center;
-}
-
 .pixels {
   margin-top: 16px;
   text-align: center;
+  @media (max-width: 460px) {
+    font-size: 12px;
+  }
 }

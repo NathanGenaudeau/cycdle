@@ -23,12 +23,12 @@ watch(() => props.lang, () => {
 <template>
   <div class="home">
     <div class="d-block pa-2">
-      <v-btn size="x-large" rounded="lg" @click="redirection('rider-wt')">
+      <v-btn size="large" rounded="lg" @click="redirection('rider-wt')">
         {{ langFile.home_title_wt }}
       </v-btn>
     </div>
     <div class="d-block pa-2">
-      <v-btn size="x-large" rounded="lg" @click="redirection('rider-prt')">
+      <v-btn size="large" rounded="lg" @click="redirection('rider-prt')">
         {{ langFile.home_title_prt }}
       </v-btn>
     </div>
