@@ -54,7 +54,7 @@ const randomRider = ref<Rider>();
 const guesses = ref<Rider[]>([]);
 const selectedValue = ref<Rider | null>(null);
 const won = ref<boolean>(false);
-const isDialogActive = ref<boolean>(false);
+const isDialogWinActive = ref<boolean>(false);
 
 const shareButtonText = ref<string>(langFile.value.game_modal_win_button_share);
 
@@ -99,7 +99,7 @@ onMounted(async () => {
     guesses.value = mode.value === 'rider-wt' ? JSON.parse(localStorage.getItem('guessesWT') as string) : JSON.parse(localStorage.getItem('guessesPRT') as string);
   }
   if (won.value) {
-    isDialogActive.value = true;
+    isDialogWinActive.value = true;
 
   }
   const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/riders?mode=${mode.value}`);
@@ -118,7 +118,7 @@ const selectRider = (riderSelected: Rider | null) => {
   if (!randomRider.value || !riderSelected || guesses.value.find((rider: Rider) => rider.id === riderSelected.id)) return;
   if (riderSelected.id === randomRider.value.id) {
     won.value = true;
-    isDialogActive.value = true;
+    isDialogWinActive.value = true;
     if (mode.value === 'rider-wt') localStorage.setItem('wonWT', JSON.stringify(true))
     if (mode.value === 'rider-prt') localStorage.setItem('wonPRT', JSON.stringify(true));
   }
@@ -255,7 +255,13 @@ const saveToClipboard = () => {
   const firstDate = new Date('2024-10-10');
   const nb = Math.floor((new Date().getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24));
   let textToShare = `Cycdle (@Cycdle) ${mode.value === 'rider-wt' ? 'WT' : 'PRT'}#${nb} - ${guesses.value.length} ${langFile.value.game_modal_win_text_share_try}\n`;
- 
+
+  //add the guess count to local storage
+  const stats:Number[] = JSON.parse(localStorage.getItem('stats') as string) || [];
+  console.log(stats);
+  stats.push(guesses.value.length);
+  localStorage.setItem('stats', JSON.stringify(stats));
+  
   for (const guess of guesses.value.slice().reverse()) {
     for (const key of Object.keys(guess)) {
       if (attributes.includes(key)) {
@@ -267,7 +273,6 @@ const saveToClipboard = () => {
     textToShare += '\n';
   }
   textToShare += '\nhttps://cycdle.fun';
- 
   navigator.clipboard.writeText(textToShare).then(
     function () {
       shareButtonText.value = langFile.value.game_modal_win_button_copy;
@@ -382,7 +387,7 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
       </template>
     </v-data-table>
  
-    <v-dialog max-width="500" v-model="isDialogActive" persistent>
+    <v-dialog max-width="500" v-model="isDialogWinActive" persistent>
       <template v-slot:default="{ isActive }">
         <v-card>
           <v-card-title class="d-flex justify-space-between align-center">

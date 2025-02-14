@@ -8,6 +8,7 @@ import en from './assets/lang/en.json';
  
 const router = useRouter();
  
+const isStatDialogActive = ref(false);
 const isHelpDialogActive = ref(false);
 const isCreditDialogActive = ref(false);
 
@@ -23,6 +24,12 @@ watch(lang, () => {
   langFile.value = lang.value === 'fr' ? fr : en;
 });
 
+let stats = JSON.parse(localStorage.getItem('stats') || '[]');
+
+watch(isStatDialogActive, () => {
+  stats = JSON.parse(localStorage.getItem('stats') || '[]');
+});
+
 </script>
  
 <template>
@@ -31,6 +38,7 @@ watch(lang, () => {
       <v-app-bar-title>
         <v-img :src="logo" class="logo" @click="router.push('/')" />
       </v-app-bar-title>
+      <v-btn icon="mdi-chart-box-outline" @click="isStatDialogActive = true"></v-btn>
       <v-btn icon="mdi-help" @click="isHelpDialogActive = true"></v-btn>
       <v-btn icon="mdi-link-variant" @click="isCreditDialogActive = true"></v-btn>
       <v-menu>
@@ -52,6 +60,20 @@ watch(lang, () => {
       <RouterView :lang />
     </v-main>
   </v-layout>
+  <v-dialog max-width="500" v-model="isStatDialogActive">
+    <template v-slot:default="{ isActive }">
+      <v-card>
+        <v-card-title class="d-flex justify-space-between align-center">
+          <div class="text-h5 ps-2">stats</div>
+          <v-btn icon="mdi-close" variant="text" @click="isActive.value = false"></v-btn>
+        </v-card-title>
+        <v-card-text class="modal-text">
+          <div>{{ stats }}</div>
+          <!--idée stat : pourcentage carré rouge/vert, nb moyen carré vert par jour -->
+        </v-card-text>
+      </v-card>
+    </template>
+  </v-dialog>
   <v-dialog max-width="500" v-model="isHelpDialogActive">
     <template v-slot:default="{ isActive }">
       <v-card>
