@@ -266,8 +266,6 @@ const saveToClipboard = () => {
     for (const key of Object.keys(guess)) {
       if (attributes.includes(key)) {
         textToShare += getAttributeColor(guess[key as keyof Rider], key) === 'green' ? '🟩' : '🟥';
-      } else if (specialities.includes(key)) {
-        textToShare += getSpecialityColor(guess[key as keyof Rider], key) === 'green' ? '🟩' : getSpecialityColor(guess[key as keyof Rider], key) === 'orange' ? '🟧' : '🟥';
       }
     }
     textToShare += '\n';
@@ -400,7 +398,6 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
               <div v-for="guess in guesses.slice().reverse()" :key="guess.id">
                 <span v-for="key of Object.keys(guess)" :key="key">
                   <v-icon v-if="attributes.includes(key)" icon="mdi mdi-square" :color="getAttributeColor(guess[key as keyof Rider], key)" />
-                  <v-icon v-else-if="specialities.includes(key)" icon="mdi mdi-square" :color="getSpecialityColor(guess[key as keyof Rider], key)" />
                 </span>
               </div>
             </div>

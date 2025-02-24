@@ -3,6 +3,8 @@ import { JSDOM } from 'jsdom';
 import fs from 'fs/promises';
 import alasql from 'alasql';
 import { v4 as uuidv4 } from 'uuid';
+import dotenv from 'dotenv';
+dotenv.config();
 
 /**
  * Retrieves URL of riders from ProCyclingStats website which will be used to build the database
@@ -15,11 +17,12 @@ async function ridersURL(teamlevel, file) {
   });
   try {
     let offset = 0;
-    const maxOffset = teamlevel === 1 ? 400 : 800;
+    let nbResults = 0;
     do {
-      const response = await got(`https://www.procyclingstats.com/rankings.php?offset=${offset}&teamlevel=${teamlevel}&filter=Filter&s=uci-individual-daily`);
+      const response = await got(`https://www.procyclingstats.com/rankings.php?offset=${offset}&teamlevel=${teamlevel}&filter=Filter&s=uci-individual`);
 
       const page = new JSDOM(response.body).window.document;
+      nbResults = parseInt(page.querySelector('b').textContent.split('/')[0], 10);
       const rows = page.querySelectorAll('tbody tr');
       rows.forEach(async (line) => {
         const url = line.querySelector('td:nth-child(4) a').href;
@@ -27,7 +30,7 @@ async function ridersURL(teamlevel, file) {
       });
       offset = parseInt(rows[rows.length - 1].querySelector('td:nth-child(1)').textContent.trim(), 10);
 
-    } while (offset < maxOffset);
+    } while (nbResults === 100);
   } catch (error) {
     console.error('Error:', error.message);
   }
@@ -67,7 +70,10 @@ async function ridersInfo(urls) {
         const uci_rank = page.querySelector('.rdr-rankings').innerHTML ? parseInt(page.querySelector('.rdr-rankings').innerHTML.split('<li>')[0].split('rnk')[1].split('>')[1].split('<')[0]) : null;
         const photo = page.querySelector('.rdr-img-cont').querySelector('img');
         const { buffer } = await got(photo.src).buffer();
-        const img64 = `data:image/jpeg;base64,${Buffer.from(buffer).toString('base64')}`;
+
+        const imgUrl = `img/${name.replaceAll(' ', '-').toLocaleLowerCase()}.jpg`;
+        await fs.writeFile(`./src/api/data/${imgUrl}`, Buffer.from(buffer));
+        const img64 = `${process.env.VITE_API_BASE_URL}/${imgUrl}`;
 
         const profile = page.querySelector('.pps').innerHTML.split('<li>').slice(1);
         const specialities = [];
