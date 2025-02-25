@@ -131,7 +131,6 @@ const selectRider = (riderSelected: Rider | null) => {
 };
  
 const attributes = ['age', 'team', 'nationality', 'weight', 'height', 'uci_rank', 'win', 'gt_participation', 'classic_participation'];
-const specialities = ['one_day_races', 'general_classification', 'time_trial', 'sprint', 'climber', 'hills'];
  
 const getAttributeColor = (value: any, type: string) => {
   if (!randomRider.value) return 'red';
