@@ -34,9 +34,18 @@
     "game_datatable_tooltip_specialties_hil": "Puncheur",
     "game_autocomplete_label": "Search for a rider",
     "game_autocomplete_placeholder": "Enter a rider's name",
-    "game_modal_win_title": "Congratulations!",
+    "game_win_text": "Congratulations, you have found today's Cycdle",
+    "game_win_button": "Résults",
     "game_modal_win_text": "Well done, you found the rider of the day! Share your score with your friends so they can try to beat it.",
     "game_modal_win_button_share": "Share",
     "game_modal_win_button_copy": "Copied",
-    "game_modal_win_text_share_try": "tries"
+    "game_modal_win_text_share_try": "tries",
+    "app_modal_stats_title": "Statistics",
+    "app_modal_stats_stat_1": "Games",
+    "app_modal_stats_stat_2": "Avg. tries",
+    "app_modal_stats_stat_3": "of 🟩",
+    "app_modal_stats_stat_4": "of 🟨",
+    "app_modal_stats_text_chart": "Distribution of tries",
+    "app_modal_stats_title_chart_1": "World Tour",
+    "app_modal_stats_title_chart_2": "Pro Tour"
 }

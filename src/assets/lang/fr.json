@@ -34,9 +34,18 @@
     "game_datatable_tooltip_specialties_hil": "Puncheur",
     "game_autocomplete_label": "Rechercher un cycliste",
     "game_autocomplete_placeholder": "Entrez le nom d'un coureur",
-    "game_modal_win_title": "Félicitations !",
-    "game_modal_win_text": "Bravo, vous avez trouvé le coureur du jour ! Partagez votre score à vos amis pour qu'ils essaient de le battre.",
+    "game_win_text": "Félicitations, tu as réussi le Cycdle du jour",
+    "game_win_button": "Résultats",
+    "game_modal_win_text": "Bravo, tu as trouvé le coureur du jour ! Partage ton score à tes amis pour qu'ils essaient de le battre.",
     "game_modal_win_button_share": "Partager",
     "game_modal_win_button_copy": "Copié",
-    "game_modal_win_text_share_try": "essais"
+    "game_modal_win_text_share_try": "essais",
+    "app_modal_stats_title": "Statistiques",
+    "app_modal_stats_stat_1": "Parties",
+    "app_modal_stats_stat_2": "Moy. essais",
+    "app_modal_stats_stat_3": "de 🟩",
+    "app_modal_stats_stat_4": "de 🟨",
+    "app_modal_stats_text_chart": "Répartition des essais",
+    "app_modal_stats_title_chart_1": "World Tour",
+    "app_modal_stats_title_chart_2": "Pro Tour"
 }

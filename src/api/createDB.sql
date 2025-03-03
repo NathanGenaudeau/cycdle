@@ -2,6 +2,7 @@ drop table if exists rider;
 
 create table rider (
   id uuid primary key not null,
+  url text not null,
   name text not null,
   photo text,
   team text,

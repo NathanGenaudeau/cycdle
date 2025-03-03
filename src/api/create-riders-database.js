@@ -89,8 +89,8 @@ async function ridersInfo(urls) {
           kpis.push(parseInt(element.split('nr')[1].split('>')[1].split('<')[0], 10));
         });
 
-        alasql('INSERT INTO rider VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-        [uuid, name, img64, team, teamLevel, age, nationality, flag, weight, height, uci_rank, kpis[0], kpis[1], kpis[2], specialities[0], specialities[1], specialities[2], specialities[3], specialities[4], specialities[5], sumSpecialities]);
+        alasql('INSERT INTO rider VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        [uuid, riderUrl, name, img64, team, teamLevel, age, nationality, flag, weight, height, uci_rank, kpis[0], kpis[1], kpis[2], specialities[0], specialities[1], specialities[2], specialities[3], specialities[4], specialities[5], sumSpecialities]);
       }
     }
 

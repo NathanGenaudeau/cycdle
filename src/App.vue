@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import { ref, watch, onMounted } from 'vue';
+import { BarChart } from 'vue-chart-3';
+import { Chart, registerables } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+Chart.register(...registerables);
+Chart.register(ChartDataLabels);
  
 import logo from './assets/logo/cycdle-white.png';
 import fr from './assets/lang/fr.json';
@@ -8,12 +13,16 @@ import en from './assets/lang/en.json';
  
 const router = useRouter();
  
-const isStatDialogActive = ref(false);
-const isHelpDialogActive = ref(false);
-const isCreditDialogActive = ref(false);
+const isStatDialogActive = ref<boolean>(false);
+const isHelpDialogActive = ref<boolean>(false);
+const isCreditDialogActive = ref<boolean>(false);
 
-const lang = ref(localStorage.getItem('lang') || 'fr');
-const langFile = ref(localStorage.getItem('lang') === 'fr' ? fr : en);
+const lang = ref<string>(localStorage.getItem('lang') || 'fr');
+const langFile = ref<typeof fr | typeof en>(localStorage.getItem('lang') === 'fr' ? fr : en);
+
+const showStats = (val: boolean) => {
+  isStatDialogActive.value = val;
+}
 
 onMounted(async () => {
   if (!localStorage.getItem('lang')) localStorage.setItem('lang', 'fr');
@@ -24,10 +33,108 @@ watch(lang, () => {
   langFile.value = lang.value === 'fr' ? fr : en;
 });
 
-let stats = JSON.parse(localStorage.getItem('stats') || '[]');
+interface Stat {
+  nbGuess: number;
+  green: number;
+  orange: number;
+  red: number;
+}
+
+const statsWT = ref<Stat[]>([]);
+const statsPRT = ref<Stat[]>([]);
+const statsTotal = ref<Stat[]>([]);
+const stats = ref<Stat>({ nbGuess: 0, green: 0, orange: 0, red: 0 });
 
 watch(isStatDialogActive, () => {
-  stats = JSON.parse(localStorage.getItem('stats') || '[]');
+  statsWT.value = JSON.parse(localStorage.getItem('statsWT') || '[]');
+  statsPRT.value = JSON.parse(localStorage.getItem('statsPRT') || '[]');
+  statsTotal.value = [...statsWT.value, ...statsPRT.value];
+
+  const keys = ['nbGuess', 'green', 'orange', 'red'] as const;
+  const totalCount = statsTotal.value.length || 1;
+  stats.value = keys.reduce((acc, key) => {
+    const sum = statsTotal.value.reduce((total, stat) => total + stat[key], 0);
+    acc[key] = sum / totalCount;
+    return acc;
+  }, {} as Stat);
+});
+
+const formatStats = (stats: Stat[]) => {
+  stats = stats.reduce((acc: any, { nbGuess }) => {
+    if (nbGuess >= 1 && nbGuess <= 5) {
+      acc[nbGuess] = (acc[nbGuess] || 0) + 1;
+    } else if (nbGuess >= 6 && nbGuess <= 10) {
+      acc['6-10'] = (acc['6-10'] || 0) + 1;
+    } else {
+      acc['10+'] = (acc['10+'] || 0) + 1;
+    }
+    return acc;
+  }, { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, '6-10': 0, '10+': 0 });
+
+  const labels = Object.keys(stats);
+  const data = Object.values(stats);
+
+  return {
+    labels,
+    datasets: [
+      {
+        data: data.map((i: any) => i + 1),
+        backgroundColor: 'rgb(10, 116, 218, 0.5)',
+        borderColor: 'rgba(10, 116, 218, 1)',
+        borderRadius: 4,
+        borderWidth: 2,
+      },
+    ],
+  };
+};
+
+const options = (chartType: string) => ({
+  barPercentage: 1.1, 
+  responsive: true,
+  maintainAspectRatio: false,
+  indexAxis: 'y',
+  plugins: {
+    title: {
+      display: true,
+      text: chartType === 'world-tour' ? langFile.value.app_modal_stats_title_chart_1 : langFile.value.app_modal_stats_title_chart_2,
+      position: 'bottom',
+      color: 'white',
+    },
+    datalabels: {
+      color: 'white',
+      anchor: 'end',
+      align: (context: any) => Math.max(...context.chart.data.datasets[0].data) / context.dataset.data[context.dataIndex] < 10 ? 'start' : 'end',
+      formatter: (value: any) => { return value - 1 === 0 ? '' : value - 1 },
+      font: {
+        size: 11,
+        weight: 'bold',
+      },
+    },
+    tooltip: {
+      enabled: false,
+    },
+    legend: {
+      display: false,
+    },
+  },
+  scales:{
+    x: {
+      beginAtZero: true,
+      suggestedMax: (context: any) => Math.max(...context.chart.data.datasets[0].data) + 1,
+      display: false,
+    },
+    y: {
+      ticks: {
+        color: 'white',
+        font: {
+          size: 14,          
+        },
+      },
+      grid: {
+        display: false,
+      },
+    },
+  },
 });
 
 </script>
@@ -57,19 +164,50 @@ watch(isStatDialogActive, () => {
     </v-app-bar>
  
     <v-main class="d-flex align-center justify-center">
-      <RouterView :lang />
+      <RouterView :lang @goToStats="showStats" />
     </v-main>
   </v-layout>
   <v-dialog max-width="500" v-model="isStatDialogActive">
     <template v-slot:default="{ isActive }">
       <v-card>
-        <v-card-title class="d-flex justify-space-between align-center">
-          <div class="text-h5 ps-2">stats</div>
+        <v-card-title class="d-flex justify-space-between align-center pb-0">
+          <div class="text-h5 ps-2">{{ langFile.app_modal_stats_title }}</div>
           <v-btn icon="mdi-close" variant="text" @click="isActive.value = false"></v-btn>
         </v-card-title>
         <v-card-text class="modal-text">
-          <div>{{ stats }}</div>
-          <!--idée stat : pourcentage carré rouge/vert, nb moyen carré vert par jour -->
+          <v-col cols="12" class="pt-0">
+            <v-row dense class="justify-space-between">
+              <v-col cols="6" md="3">
+                <v-card class="pa-2 text-center" color="rgba(10, 116, 218, 0.8)">
+                  <v-card-title class="text-h5 font-weight-bold px-0">{{ statsTotal.length }}</v-card-title>
+                  <v-card-text class="text-caption pa-0">{{ langFile.app_modal_stats_stat_1 }}</v-card-text>
+                </v-card>
+              </v-col>
+              <v-col cols="6" md="3">
+                <v-card class="pa-2 text-center" color="rgba(10, 116, 218, 0.8)">
+                  <v-card-title class="text-h5 font-weight-bold px-0">{{ stats.nbGuess.toFixed(1) }}</v-card-title>
+                  <v-card-text class="text-caption pa-0">{{ langFile.app_modal_stats_stat_2 }}</v-card-text>
+                </v-card>
+              </v-col>
+              <v-col cols="6" md="3">
+                <v-card class="pa-2 text-center" color="rgba(10, 116, 218, 0.8)">
+                  <v-card-title class="text-h5 font-weight-bold px-0">{{ Math.round(stats.green) }}%</v-card-title>
+                  <v-card-text class="text-caption pa-0">{{ langFile.app_modal_stats_stat_3 }}</v-card-text>
+                </v-card>
+              </v-col>
+              <v-col cols="6" md="3">
+                <v-card class="pa-2 text-center" color="rgba(10, 116, 218, 0.8)">
+                  <v-card-title class="text-h5 font-weight-bold px-0">{{ Math.round(stats.orange) }}%</v-card-title>
+                  <v-card-text class="text-caption pa-0">{{ langFile.app_modal_stats_stat_4 }}</v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-col>
+          <h3 class="py-2">{{ langFile.app_modal_stats_text_chart }}</h3>
+          <div id="chart-container">
+            <BarChart class="chart" :chartData="formatStats(statsWT)" :options="options('world-tour')" />
+            <BarChart class="chart" :chartData="formatStats(statsPRT)" :options="options('pro-tour')" />
+          </div>
         </v-card-text>
       </v-card>
     </template>
@@ -124,17 +262,17 @@ watch(isStatDialogActive, () => {
             <v-row class="mt-0">
               <v-col class="d-flex justify-center align-center">
                 <v-sheet>
-                  <img src="./assets/help/help_graph_red.png"/>
+                  <img alt="Chart explaining red chart signification" src="./assets/help/help_graph_red.png"/>
                 </v-sheet>
               </v-col>
               <v-col class="d-flex justify-center align-center">
                 <v-sheet>
-                  <img src="./assets/help/help_graph_orange.png"/>
+                  <img alt="Chart explaining orange chart signification" src="./assets/help/help_graph_orange.png"/>
                 </v-sheet>
               </v-col>
               <v-col class="d-flex justify-center align-center">
                 <v-sheet>
-                  <img src="./assets/help/help_graph_green.png"/>
+                  <img alt="Chart explaining green chart signification" src="./assets/help/help_graph_green.png"/>
                 </v-sheet>
               </v-col>
             </v-row>
