@@ -42,8 +42,8 @@ async function ridersURL(teamlevel, file) {
  */
 async function ridersInfo(urls) {
   try {
-    alasql(`CREATE FILESTORAGE DATABASE IF NOT EXISTS mydb("./src/api/db.json");
-    ATTACH FILESTORAGE DATABASE mydb("./src/api/db.json");
+    alasql(`CREATE FILESTORAGE DATABASE IF NOT EXISTS mydb("./src/api/db_update.json");
+    ATTACH FILESTORAGE DATABASE mydb("./src/api/db_update.json");
     USE mydb;
     SOURCE "./src/api/createDB.sql";`);
 
@@ -93,7 +93,10 @@ async function ridersInfo(urls) {
         [uuid, riderUrl, name, img64, team, teamLevel, age, nationality, flag, weight, height, uci_rank, kpis[0], kpis[1], kpis[2], specialities[0], specialities[1], specialities[2], specialities[3], specialities[4], specialities[5], sumSpecialities]);
       }
     }
-
+    const result = alasql('SELECT COUNT(*) as number FROM rider');
+    if (result[0].number > 0) {
+      fs.copyFile('./src/api/db_update.json', './src/api/db.json');
+    }
   } catch (error) {
     console.error('Error:', error.message);
   }
