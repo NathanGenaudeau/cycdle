@@ -229,21 +229,21 @@ const options = (chartType: string) => ({
             <v-row class="mt-0">
               <v-col class="d-flex justify-center align-center">
                 <v-sheet>
-                  <v-chip color="red">
+                  <v-chip color="red" class="px-3">
                     61kg <v-icon icon="mdi-chevron-up" />
                   </v-chip>
                 </v-sheet>
               </v-col>
               <v-col class="d-flex justify-center align-center">
                 <v-sheet>
-                  <v-chip color="orange">
+                  <v-chip color="orange" class="px-3">
                     70 kg <v-icon icon="mdi-chevron-down" />
                   </v-chip>
                 </v-sheet>
               </v-col>
               <v-col class="d-flex justify-center align-center">
                 <v-sheet>
-                  <v-chip color="green">
+                  <v-chip color="green" class="px-3">
                     68kg <v-icon icon="mdi-check" />
                   </v-chip>
                 </v-sheet>
