@@ -67,7 +67,7 @@ async function ridersInfo(urls) {
         const weight = infos[2].includes('Weight') ? parseInt(infos[2].split('Weight')[1].split('>')[1].split('kg')[0].trim()) : null;
         const height = infos[2].includes('Height') ? parseFloat(infos[2].split('Height')[1].split('>')[1].split('m')[0].trim()) : null;
 
-        const uci_rank = page.querySelector('.rdr-rankings').innerHTML ? parseInt(page.querySelector('.rdr-rankings').innerHTML.split('<li>')[0].split('rnk')[1].split('>')[1].split('<')[0]) : null;
+        const uci_rank = page.querySelector('.rdr-rankings').innerHTML ? parseInt(page.querySelector('.rdr-rankings')?.innerHTML.split('<li>')[0]?.split('UCI World')[1]?.split('rnk')[1]?.split('>')[1]?.split('<')[0]) : null;
         const photo = page.querySelector('.rdr-img-cont').querySelector('img');
         const { buffer } = await got(photo.src).buffer();
 

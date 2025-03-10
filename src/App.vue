@@ -152,12 +152,16 @@ const options = (chartType: string) => ({
         <template v-slot:activator="{ props }">
           <v-btn icon="mdi-translate" v-bind="props"></v-btn>
         </template>
-        <v-list>
-          <v-list-item>
-            <v-btn icon="fi fi-fr" @click="lang = 'fr'"></v-btn>
+        <v-list id="lang">
+          <v-list-item @click="lang = 'fr'" class="lang-item">
+            <v-avatar>
+              <span class="fi fi-fr flag-icon"></span>
+            </v-avatar>
           </v-list-item>
-          <v-list-item>
-            <v-btn icon="fi fi-gb" @click="lang = 'en'"></v-btn>
+          <v-list-item @click="lang = 'en'" class="lang-item">
+            <v-avatar>
+              <span class="fi fi-gb flag-icon"></span>
+            </v-avatar>
           </v-list-item>
         </v-list>
       </v-menu>
@@ -225,34 +229,34 @@ const options = (chartType: string) => ({
             <v-row class="mt-0">
               <v-col class="d-flex justify-center align-center">
                 <v-sheet>
+                  <v-chip color="red">
+                    61kg <v-icon icon="mdi-chevron-up" />
+                  </v-chip>
+                </v-sheet>
+              </v-col>
+              <v-col class="d-flex justify-center align-center">
+                <v-sheet>
+                  <v-chip color="orange">
+                    70 kg <v-icon icon="mdi-chevron-down" />
+                  </v-chip>
+                </v-sheet>
+              </v-col>
+              <v-col class="d-flex justify-center align-center">
+                <v-sheet>
                   <v-chip color="green">
                     68kg <v-icon icon="mdi-check" />
                   </v-chip>
                 </v-sheet>
               </v-col>
-              <v-col class="d-flex justify-center align-center">
-                <v-sheet>
-                  <v-chip color="red">
-                    66kg <v-icon icon="mdi-chevron-up" />
-                  </v-chip>
-                </v-sheet>
-              </v-col>
-              <v-col class="d-flex justify-center align-center">
-                <v-sheet>
-                  <v-chip color="red">
-                    -- kg <v-icon icon="mdi-close" />
-                  </v-chip>
-                </v-sheet>
-              </v-col>
             </v-row>
             <v-row class="mt-n4">
-              <v-col class="d-flex justify-center align-center">
+              <v-col class="d-flex justify-center align-center text-center">
                 <v-sheet>{{ langFile.app_modal_how_to_play_legend_1_1 }}</v-sheet>
               </v-col>
-              <v-col class="d-flex justify-center align-center">
+              <v-col class="d-flex justify-center align-center text-center">
                 <v-sheet>{{ langFile.app_modal_how_to_play_legend_1_2 }}</v-sheet>
               </v-col>
-              <v-col class="d-flex justify-center align-center">
+              <v-col class="d-flex justify-center align-center text-center">
                 <v-sheet>{{ langFile.app_modal_how_to_play_legend_1_3 }}</v-sheet>
               </v-col>
             </v-row>
@@ -277,13 +281,13 @@ const options = (chartType: string) => ({
               </v-col>
             </v-row>
             <v-row class="mt-n4">
-              <v-col class="d-flex justify-center align-center">
+              <v-col class="d-flex justify-center align-center text-center">
                 <v-sheet>{{ langFile.app_modal_how_to_play_legend_2_1 }}</v-sheet>
               </v-col>
-              <v-col class="d-flex justify-center align-center">
+              <v-col class="d-flex justify-center align-center text-center">
                 <v-sheet>{{ langFile.app_modal_how_to_play_legend_2_2 }}</v-sheet>
               </v-col>
-              <v-col class="d-flex justify-center align-center">
+              <v-col class="d-flex justify-center align-center text-center">
                 <v-sheet>{{ langFile.app_modal_how_to_play_legend_2_3 }}</v-sheet>
               </v-col>
             </v-row>

@@ -156,6 +156,41 @@ const selectRider = (riderSelected: Rider | null) => {
     localStorage.setItem(statsName, JSON.stringify(stats));
   }
 };
+
+const timeBeforeNextRider = ref<string>('');
+const nextDay = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1);
+
+const updateCountdown = () => {
+  const diff = nextDay.getTime() - new Date().getTime();
+
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+  if (hours <= 0 && minutes <= 0 && seconds <= 0) {
+    timeBeforeNextRider.value = '00:00:00';
+  } else {
+    timeBeforeNextRider.value = `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+  }
+};
+
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+const getOrdinalSuffix = (value: number) => {
+  if (props.lang === 'fr') {
+    return value === 1 ? 'er' : 'ème';
+  } 
+  else if (props.lang === 'en') {
+    if ([11, 12, 13].includes(value % 100)) return 'th';
+    const lastDigit = value % 10;
+    if (lastDigit === 1) return 'st';
+    if (lastDigit === 2) return 'nd';
+    if (lastDigit === 3) return 'rd';
+    return 'th';
+  }
+  return '';
+};
  
 const getAttributeColor = (value: string | number, type: string) => {
   if (!randomRider.value) return 'red';
@@ -321,9 +356,13 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
  
 <template>
   <div class="game d-block flex-column align-center justify-center">
-    <div v-if="won" class="d-flex align-center justify-center mb-8 flex-column flex-md-row text-center text-md-left">
-      <h4 class="mb-2 mb-md-0">{{ langFile.game_win_text }}</h4>
+    <div v-if="won" class="d-flex align-center justify-center flex-column flex-md-row text-center text-md-left">
+      <h4 class="mb-2 mb-md-0 mr-2">{{ langFile.game_win_text }}</h4>
       <v-btn @click="isDialogWinActive = true" class="ml-md-2" color="#0a74da" prepend-icon="mdi-trophy-variant-outline">{{ langFile.game_win_button }}</v-btn>
+    </div>
+    <div v-if="won" class="d-flex align-center justify-center text-center mt-2 mb-8 ">
+      <h4>{{ langFile.game_win_time_before_new_game }}</h4>
+      <v-chip variant="outlined" size="large" class="ml-2 font-weight-bold" color="#0a74da">{{ timeBeforeNextRider }}</v-chip>
     </div>
     <v-autocomplete :label="langFile.game_autocomplete_label" :items="riders" :custom-filter="customFilter"
       v-model="selectedValue" @update:model-value="selectRider(selectedValue)" :placeholder="langFile.game_autocomplete_placeholder"
@@ -396,7 +435,7 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
       </template>
       <template v-slot:item.uci_rank="{ value }">
         <v-chip :color="getAttributeColor(value, 'uci_rank')">
-          {{ value === 1 ? `${value}er` : `${value}ème` }} <v-icon :icon="getAttributeArrow(value, 'uci_rank')" />
+          {{ value }}{{ getOrdinalSuffix(value) }} <v-icon :icon="getAttributeArrow(value, 'uci_rank')" />
         </v-chip>
       </template>
       <template v-slot:item.win="{ value }">

@@ -21,6 +21,16 @@
   top: 20%;
   width: 85%;
 }
+
+#lang {
+  padding-bottom: 0;
+
+  .lang-item {
+    .flag-icon {
+      font-size: 24px;
+    }
+  }
+}
   
 #avatar-img-autocomplete {
   clip-path: inset(0 0 20px 0 round 100px);
