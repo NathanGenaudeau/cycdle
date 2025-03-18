@@ -17,20 +17,20 @@ const isStatDialogActive = ref<boolean>(false);
 const isHelpDialogActive = ref<boolean>(false);
 const isCreditDialogActive = ref<boolean>(false);
 
-const lang = ref<string>(localStorage.getItem('lang') || 'fr');
-const langFile = ref<typeof fr | typeof en>(localStorage.getItem('lang') === 'fr' ? fr : en);
+const lang = ref<string>(localStorage.getItem('lang') || 'en');
+const langFile = ref<typeof fr | typeof en>(localStorage.getItem('lang') === 'en' ? en : fr);
 
 const showStats = (val: boolean) => {
   isStatDialogActive.value = val;
 }
 
 onMounted(async () => {
-  if (!localStorage.getItem('lang')) localStorage.setItem('lang', 'fr');
+  if (!localStorage.getItem('lang')) localStorage.setItem('lang', 'en');
 });
 
 watch(lang, () => {
   localStorage.setItem('lang', lang.value);
-  langFile.value = lang.value === 'fr' ? fr : en;
+  langFile.value = lang.value === 'en' ? en : fr;
 });
 
 interface Stat {

@@ -13,10 +13,10 @@ function redirection(selectedMode: string) {
 }
 
 const props = defineProps({ lang: String});
-const langFile = ref(localStorage.getItem('lang') === 'fr' ? fr : en);
+const langFile = ref(localStorage.getItem('lang') === 'en' ? en : fr);
 
 watch(() => props.lang, () => {
-  langFile.value = props.lang === 'fr' ? fr : en;
+  langFile.value = props.lang === 'en' ? en : fr;
 });
 </script>
 

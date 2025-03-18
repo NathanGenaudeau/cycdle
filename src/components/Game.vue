@@ -10,7 +10,7 @@ import fr from '../assets/lang/fr.json';
 import en from '../assets/lang/en.json';
 
 const props = defineProps({ lang: String });
-const langFile = ref(localStorage.getItem('lang') === 'fr' ? fr : en);
+const langFile = ref(localStorage.getItem('lang') === 'en' ? en : fr);
 
 const emit = defineEmits(['goToStats']);
 const goToStats = (val: boolean) => {
@@ -18,8 +18,8 @@ const goToStats = (val: boolean) => {
 }
 
 watch(() => props.lang, () => {
-  langFile.value = props.lang === 'fr' ? fr : en;
-  headers = props.lang === 'fr' ? headerFR : headerEN;
+  langFile.value = props.lang === 'en' ? en : fr;
+  headers = props.lang === 'en' ? headerEN : headerFR;
 });
 
 enum teamLevel {
@@ -350,7 +350,9 @@ const saveToClipboard = () => {
 
 const customFilter = (_itemTitle: any, query: string, item: any) => {
   const name = item.raw.name.toLowerCase();
-  return name.indexOf(query.toLowerCase()) > -1;
+  const team = item.raw.team.toLowerCase();
+  const nationality = item.raw.nationality.toLowerCase();
+  return name.indexOf(query.toLowerCase()) > -1 || team.indexOf(query.toLowerCase()) > -1 || nationality.indexOf(query.toLowerCase()) > -1;
 }
 </script>
  
