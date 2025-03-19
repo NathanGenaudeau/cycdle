@@ -9,6 +9,9 @@ Chart.register(ChartDataLabels);
 import fr from '../assets/lang/fr.json';
 import en from '../assets/lang/en.json';
 
+import neighbours from '../api/data/neighbours.json';
+const neighboursTyped = neighbours as Record<string, { neighbours: string[] }>;
+
 const props = defineProps({ lang: String });
 const langFile = ref(localStorage.getItem('lang') === 'en' ? en : fr);
 
@@ -198,6 +201,8 @@ const getAttributeColor = (value: string | number, type: string) => {
   const valueRider = randomRider.value[type as keyof Rider];
   if (value === valueRider) return 'green';
 
+  if (type === 'flag' && typeof value === 'string' && typeof valueRider === 'string' && neighboursTyped[value.toUpperCase()].neighbours.includes(valueRider.toUpperCase())) return 'orange';
+  
   const helpGap: any  = {age: 2, height: 0.04, weight: 4, uci_rank: 30, win: 5, gt_participation: 1, classic_participation: 2}; // customize variables to return orange to help the player
   if (typeof valueRider === 'number' && typeof value === 'number' && value - helpGap[type] <= valueRider && value + helpGap[type] >= valueRider) return 'orange';
   return 'red';
@@ -422,7 +427,7 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
         </v-chip>
       </template>
       <template v-slot:item.nationality="{ item }">
-        <v-chip :color="getAttributeColor(item.nationality, 'nationality')" :prepend-icon="`fi fi-${item.flag}`">
+        <v-chip :color="getAttributeColor(item.flag, 'flag')" :prepend-icon="`fi fi-${item.flag}`">
           {{ item.nationality }}
         </v-chip>
       </template>

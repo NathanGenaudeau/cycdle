@@ -13,9 +13,9 @@ dist-ssr
 *.local
 
 .env
-src/api/data/*
-src/api/db.json
-src/api/db_update.json
+src/api/data/img
+src/api/data/*.txt
+src/api/*.json
 
 # Editor directories and files
 .vscode/*
