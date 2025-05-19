@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, } from 'vue';
+import { useDisplay } from 'vuetify'
 import { BarChart } from 'vue-chart-3';
 import { Chart, registerables } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 Chart.register(...registerables);
 Chart.register(ChartDataLabels);
+
+const { mobile } = useDisplay();
 
 import fr from '../assets/lang/fr.json';
 import en from '../assets/lang/en.json';
@@ -179,6 +182,30 @@ const updateCountdown = () => {
 
 setInterval(updateCountdown, 1000);
 updateCountdown();
+
+const getHelpText = (value: string | number, type: string) => {
+  switch (type) {
+    case 'flag':
+      if (typeof value !== 'string') return '';
+      return neighboursTyped[value.toUpperCase()]?.neighbours.length > 0 ? langFile.value.game_datatable_tooltip_nationality_orange : langFile.value.game_datatable_tooltip_nationality_red;
+    case 'age':
+      return getAttributeArrow(value, 'age') === 'mdi-chevron-up' ? langFile.value.game_datatable_tooltip_age_upper : langFile.value.game_datatable_tooltip_age_lower;
+    case 'weight':
+      return getAttributeArrow(value, 'weight') === 'mdi-chevron-up' ? langFile.value.game_datatable_tooltip_weight_upper : langFile.value.game_datatable_tooltip_weight_lower;
+    case 'height':
+      return getAttributeArrow(value, 'height') === 'mdi-chevron-up' ? langFile.value.game_datatable_tooltip_height_upper : langFile.value.game_datatable_tooltip_height_lower;
+    case 'uci_rank':
+      return getAttributeArrow(value, 'uci_rank') === 'mdi-chevron-up' ? langFile.value.game_datatable_tooltip_uci_rank_upper : langFile.value.game_datatable_tooltip_uci_rank_lower;
+    case 'win':
+      return getAttributeArrow(value, 'win') === 'mdi-chevron-up' ? langFile.value.game_datatable_tooltip_win_upper : langFile.value.game_datatable_tooltip_win_lower;
+    case 'gt_participation':
+      return getAttributeArrow(value, 'gt_participation') === 'mdi-chevron-up' ? langFile.value.game_datatable_tooltip_gt_participation_upper : langFile.value.game_datatable_tooltip_gt_participation_lower;
+    case 'classic_participation':
+      return getAttributeArrow(value, 'classic_participation') === 'mdi-chevron-up' ? langFile.value.game_datatable_tooltip_classic_participation_upper : langFile.value.game_datatable_tooltip_classic_participation_lower;
+    default:
+      return '';
+  }
+}
 
 const getOrdinalSuffix = (value: number) => {
   if (props.lang === 'fr') {
@@ -422,43 +449,82 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
         </v-chip>
       </template>
       <template v-slot:item.age="{ value }">
-        <v-chip :color="getAttributeColor(value, 'age')">
-          {{ value }} <v-icon :icon="getAttributeArrow(value, 'age')" />
-        </v-chip>
+        <v-tooltip :open-on-click="mobile" :location="mobile ? 'bottom' : 'right'" :disabled="getAttributeColor(value, 'age') === 'green'" max-width="250">
+          {{ getHelpText(value, 'age') }}
+          <template v-slot:activator="{ props }">
+            <v-chip :color="getAttributeColor(value, 'age')" v-bind="props">
+              {{ value }} <v-icon :icon="getAttributeArrow(value, 'age')" />
+            </v-chip>
+          </template>
+        </v-tooltip>
       </template>
       <template v-slot:item.nationality="{ item }">
-        <v-chip :color="getAttributeColor(item.flag, 'flag')" :prepend-icon="`fi fi-${item.flag}`">
-          {{ item.nationality }}
-        </v-chip>
+        <v-tooltip :open-on-click="mobile" :location="mobile ? 'bottom' : 'right'" :disabled="getAttributeColor(item.flag, 'flag') === 'green'" max-width="250">
+          {{ getHelpText(item.flag, 'flag') }}
+          <template v-slot:activator="{ props }">
+            <v-chip :color="getAttributeColor(item.flag, 'flag')" :prepend-icon="`fi fi-${item.flag}`" v-bind="props">
+              {{ item.nationality }}
+            </v-chip>
+          </template>
+        </v-tooltip>
       </template>
       <template v-slot:item.measurement="{ item }">
-        <v-chip :color="getAttributeColor(item.weight, 'weight')">
-          {{ item.weight || '-- ' }}kg <v-icon :icon="getAttributeArrow(item.weight, 'weight')" />
-        </v-chip>
+        <v-tooltip :open-on-click="mobile" :location="mobile ? 'bottom' : 'right'" :disabled="getAttributeColor(item.weight, 'weight') === 'green'" max-width="250">
+          {{ getHelpText(item.weight, 'weight') }}
+          <template v-slot:activator="{ props }">
+            <v-chip :color="getAttributeColor(item.weight, 'weight')" v-bind="props">
+              {{ item.weight || '-- ' }}kg <v-icon :icon="getAttributeArrow(item.weight, 'weight')" />
+            </v-chip>
+          </template>
+        </v-tooltip>
         <v-divider inset thickness="5" color="transparent" />
-        <v-chip :color="getAttributeColor(item.height, 'height')">
-          {{ item.height || '-- ' }}m <v-icon :icon="getAttributeArrow(item.height, 'height')" />
-        </v-chip>
+        <v-tooltip :open-on-click="mobile" :location="mobile ? 'bottom' : 'right'" :disabled="getAttributeColor(item.height, 'height') === 'green'" max-width="250">
+          {{ getHelpText(item.height, 'height') }}
+          <template v-slot:activator="{ props }">
+            <v-chip :color="getAttributeColor(item.height, 'height')" v-bind="props">
+              {{ item.height || '-- ' }}m <v-icon :icon="getAttributeArrow(item.height, 'height')" />
+            </v-chip>
+          </template>
+        </v-tooltip>
       </template>
       <template v-slot:item.uci_rank="{ value }">
-        <v-chip :color="getAttributeColor(value, 'uci_rank')">
-          {{ value }}{{ getOrdinalSuffix(value) }} <v-icon :icon="getAttributeArrow(value, 'uci_rank')" />
-        </v-chip>
+        <v-tooltip :open-on-click="mobile" :location="mobile ? 'bottom' : 'right'" :disabled="getAttributeColor(value, 'uci_rank') === 'green'" max-width="250">
+          {{ getHelpText(value, 'uci_rank') }}
+          <template v-slot:activator="{ props }">
+            <v-chip :color="getAttributeColor(value, 'uci_rank')" v-bind="props">
+              {{ value }}{{ getOrdinalSuffix(value) }} <v-icon :icon="getAttributeArrow(value, 'uci_rank')" />
+            </v-chip>
+          </template>
+        </v-tooltip>
       </template>
       <template v-slot:item.win="{ value }">
-        <v-chip :color="getAttributeColor(value, 'win')">
-          {{ value }} <v-icon :icon="getAttributeArrow(value, 'win')" />
-        </v-chip>
+        <v-tooltip :open-on-click="mobile" :location="mobile ? 'bottom' : 'right'" :disabled="getAttributeColor(value, 'win') === 'green'" max-width="250">
+          {{ getHelpText(value, 'win') }}
+          <template v-slot:activator="{ props }">
+            <v-chip :color="getAttributeColor(value, 'win')" v-bind="props">
+              {{ value }}<v-icon :icon="getAttributeArrow(value, 'win')" />
+            </v-chip>
+          </template>
+        </v-tooltip>
       </template>
       <template v-slot:item.partGTClassic="{ item }">
-        <v-chip :color="getAttributeColor(item.gt_participation, 'gt_participation')">
-          {{ item.gt_participation }} <v-icon :icon="getAttributeArrow(item.gt_participation, 'gt_participation')" />
-        </v-chip>
+        <v-tooltip :open-on-click="mobile" :location="mobile ? 'bottom' : 'right'" :disabled="getAttributeColor(item.gt_participation, 'gt_participation') === 'green'" max-width="250">
+          {{ getHelpText(item.gt_participation, 'gt_participation') }}
+          <template v-slot:activator="{ props }">
+            <v-chip :color="getAttributeColor(item.gt_participation, 'gt_participation')" v-bind="props">
+              {{ item.gt_participation }}<v-icon :icon="getAttributeArrow(item.gt_participation, 'gt_participation')" />
+            </v-chip>
+          </template>
+        </v-tooltip>
         <v-divider inset thickness="5" color="transparent" />
-        <v-chip :color="getAttributeColor(item.classic_participation, 'classic_participation')">
-          {{ item.classic_participation }} <v-icon
-            :icon="getAttributeArrow(item.classic_participation, 'classic_participation')" />
-        </v-chip>
+        <v-tooltip :open-on-click="mobile" :location="mobile ? 'bottom' : 'right'" :disabled="getAttributeColor(item.classic_participation, 'classic_participation') === 'green'" max-width="250">
+          {{ getHelpText(item.classic_participation, 'classic_participation') }}
+          <template v-slot:activator="{ props }">
+            <v-chip :color="getAttributeColor(item.classic_participation, 'classic_participation')" v-bind="props">
+              {{ item.classic_participation }}<v-icon :icon="getAttributeArrow(item.classic_participation, 'classic_participation')" />
+            </v-chip>
+          </template>
+        </v-tooltip>
       </template>
       <template v-slot:item.stats="{ item }">
         <BarChart :chartData="formatRiderSpecialities(item)" :options :height="300" />
