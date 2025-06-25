@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch, } from 'vue';
+import { onMounted, onUnmounted, ref, watch, } from 'vue';
 import { useDisplay } from 'vuetify'
 import { BarChart } from 'vue-chart-3';
 import { Chart, registerables } from 'chart.js';
@@ -7,60 +7,18 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 Chart.register(...registerables);
 Chart.register(ChartDataLabels);
 
-const { mobile } = useDisplay();
-
-import fr from '../assets/lang/fr.json';
-import en from '../assets/lang/en.json';
+import type { Rider } from '../types/Rider';
+import type { RiderSpecialities } from '../types/RiderSpecialities';
 
 import neighbours from '../api/data/neighbours.json';
 const neighboursTyped = neighbours as Record<string, { neighbours: string[] }>;
-
-const props = defineProps({ lang: String });
-const langFile = ref(localStorage.getItem('lang') === 'en' ? en : fr);
 
 const emit = defineEmits(['goToStats']);
 const goToStats = (val: boolean) => {
   emit('goToStats', val);
 }
 
-watch(() => props.lang, () => {
-  langFile.value = props.lang === 'en' ? en : fr;
-  headers = props.lang === 'en' ? headerEN : headerFR;
-});
-
-enum teamLevel {
-  WT,
-  PRT
-}
-
-interface RiderSpecialities {
-  general_classification: number;
-  climber: number;
-  hills: number;
-  one_day_races: number;
-  sprint: number;
-  time_trial: number;
-}
-
-interface Rider extends RiderSpecialities {
-  id: string;
-  url: string;
-  name: string;
-  photo: string;
-  team: string;
-  teamLevel: teamLevel;
-  age: number;
-  nationality: string;
-  flag: string;
-  weight: number;
-  height: number;
-  uciRank: number;
-  sum_specialities: number;
-  win: number;
-  gt_participation: number;
-  classic_participation: number;
-}
-
+const { mobile } = useDisplay();
 const riders = ref<Rider[]>([]);
 const randomRider = ref<Rider>();
 const guesses = ref<Rider[]>([]);
@@ -68,33 +26,41 @@ const selectedValue = ref<Rider | null>(null);
 const won = ref<boolean>(false);
 const isDialogWinActive = ref<boolean>(false);
 
+import fr from '../assets/lang/fr.json';
+import en from '../assets/lang/en.json';
+
+const props = defineProps({ lang: String });
+const langFile = ref(localStorage.getItem('lang') === 'en' ? en : fr);
+
+const baseHeaders = [
+  { key: 'name' },
+  { key: 'team' },
+  { key: 'age' },
+  { key: 'nationality' },
+  { key: 'weight_height' },
+  { key: 'uci_rank' },
+  { key: 'win' },
+  { key: 'gt_classic' },
+  { key: 'specialties', minWidth: '230px', maxWidth: '230px' },
+];
+
+const generateHeaders = (langObj: typeof en | typeof fr) =>
+  baseHeaders.map(h => ({
+    title: langObj[`game_datatable_header_${h.key}` as keyof typeof langObj] as string,
+    key: h.key,
+    align: 'center' as const,
+    ...('minWidth' in h ? { minWidth: h.minWidth } : {}),
+    ...('maxWidth' in h ? { maxWidth: h.maxWidth } : {})
+  }));
+
+const headers = ref(generateHeaders(langFile.value));
+
+watch(() => props.lang, () => {
+  langFile.value = props.lang === 'en' ? en : fr;
+  headers.value = generateHeaders(langFile.value);
+});
+
 const shareButtonText = ref<string>(langFile.value.game_modal_win_button_share);
-
-const headerFR = [
-  { title: fr.game_datatable_header_name, key: 'name', sortable: false, align: 'center' as const },
-  { title: fr.game_datatable_header_team, key: 'team', sortable: false, align: 'center' as const },
-  { title: fr.game_datatable_header_age, key: 'age', sortable: false, align: 'center' as const },
-  { title: fr.game_datatable_header_nationality, key: 'nationality', sortable: false, align: 'center' as const },
-  { title: fr.game_datatable_header_weight_height, key: 'measurement', sortable: false, align: 'center' as const },
-  { title: fr.game_datatable_header_uci_rank, key: 'uci_rank', sortable: false, align: 'center' as const },
-  { title: fr.game_datatable_header_win, key: 'win', sortable: false, align: 'center' as const },
-  { title: fr.game_datatable_header_gt_classic, key: 'partGTClassic', sortable: false, align: 'center' as const },
-  { title: fr.game_datatable_header_specialties, key: 'stats', sortable: false, minWidth: '230px', maxWidth: '230px', align: 'center' as const }
-];
-const headerEN = [
-  { title: en.game_datatable_header_name, key: 'name', sortable: false, align: 'center' as const },
-  { title: en.game_datatable_header_team, key: 'team', sortable: false, align: 'center' as const },
-  { title: en.game_datatable_header_age, key: 'age', sortable: false, align: 'center' as const },
-  { title: en.game_datatable_header_nationality, key: 'nationality', sortable: false, align: 'center' as const },
-  { title: en.game_datatable_header_weight_height, key: 'measurement', sortable: false, align: 'center' as const},
-  { title: en.game_datatable_header_uci_rank, key: 'uci_rank', sortable: false, align: 'center' as const },
-  { title: en.game_datatable_header_win, key: 'win', sortable: false, align: 'center' as const },
-  { title: en.game_datatable_header_gt_classic, key: 'partGTClassic', sortable: false, align: 'center' as const },
-  { title: en.game_datatable_header_specialties, key: 'stats', sortable: false, minWidth: '230px', maxWidth: '230px', align: 'center' as const }
-];
-
-let headers = props.lang === 'en' ? headerEN : headerFR;
-
 const mode= ref<string>(localStorage.getItem('mode') || 'rider-wt');
 
 const attributes = ['age', 'team', 'nationality', 'weight', 'height', 'uci_rank', 'win', 'gt_participation', 'classic_participation'];
@@ -165,6 +131,7 @@ const selectRider = (riderSelected: Rider | null) => {
 
 const timeBeforeNextRider = ref<string>('');
 const nextDay = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1);
+let countdownInterval: number | undefined;
 
 const updateCountdown = () => {
   const diff = nextDay.getTime() - new Date().getTime();
@@ -180,8 +147,14 @@ const updateCountdown = () => {
   }
 };
 
-setInterval(updateCountdown, 1000);
-updateCountdown();
+onMounted(() => {
+  countdownInterval = window.setInterval(updateCountdown, 1000);
+  updateCountdown();
+});
+
+onUnmounted(() => {
+  if (countdownInterval !== undefined) clearInterval(countdownInterval);
+});
 
 const getHelpText = (value: string | number, type: string) => {
   switch (type) {
@@ -381,9 +354,9 @@ const saveToClipboard = () => {
 }
 
 const customFilter = (_itemTitle: any, query: string, item: any) => {
-  const name = item.raw.name.toLowerCase();
-  const team = item.raw.team.toLowerCase();
-  const nationality = item.raw.nationality.toLowerCase();
+  const name = typeof item.raw.name === 'string' ? item.raw.name.toLowerCase() : '';
+  const team = typeof item.raw.team === 'string' ? item.raw.team.toLowerCase() : '';
+  const nationality = typeof item.raw.nationality === 'string' ? item.raw.nationality.toLowerCase() : '';
   return name.indexOf(query.toLowerCase()) > -1 || team.indexOf(query.toLowerCase()) > -1 || nationality.indexOf(query.toLowerCase()) > -1;
 }
 </script>
@@ -421,8 +394,8 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
       </template>
     </v-autocomplete>
  
-    <v-data-table :items="guesses" :headers="headers" hide-no-data items-per-page="-1">
-      <template v-slot:header.stats="{ column }">
+    <v-data-table :items="guesses" :headers="headers" hide-no-data items-per-page="-1" disable-sort>
+      <template v-slot:header.specialties="{ column }">
         {{ column.title }}
         <v-tooltip open-on-click>
           <template v-slot:activator="{ props }">
@@ -468,7 +441,7 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
           </template>
         </v-tooltip>
       </template>
-      <template v-slot:item.measurement="{ item }">
+      <template v-slot:item.weight_height="{ item }">
         <v-tooltip :open-on-click="mobile" :location="mobile ? 'bottom' : 'right'" :disabled="getAttributeColor(item.weight, 'weight') === 'green'" max-width="250">
           {{ getHelpText(item.weight, 'weight') }}
           <template v-slot:activator="{ props }">
@@ -507,7 +480,7 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
           </template>
         </v-tooltip>
       </template>
-      <template v-slot:item.partGTClassic="{ item }">
+      <template v-slot:item.gt_classic="{ item }">
         <v-tooltip :open-on-click="mobile" :location="mobile ? 'bottom' : 'right'" :disabled="getAttributeColor(item.gt_participation, 'gt_participation') === 'green'" max-width="250">
           {{ getHelpText(item.gt_participation, 'gt_participation') }}
           <template v-slot:activator="{ props }">
@@ -526,7 +499,7 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
           </template>
         </v-tooltip>
       </template>
-      <template v-slot:item.stats="{ item }">
+      <template v-slot:item.specialties="{ item }">
         <BarChart :chartData="formatRiderSpecialities(item)" :options :height="300" />
       </template>
       <template v-slot:bottom>

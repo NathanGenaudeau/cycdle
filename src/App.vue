@@ -17,7 +17,7 @@ const isStatDialogActive = ref<boolean>(false);
 const isHelpDialogActive = ref<boolean>(false);
 const isCreditDialogActive = ref<boolean>(false);
 
-const lang = ref<string>(localStorage.getItem('lang') || 'en');
+const lang = ref<string>(localStorage.getItem('lang') || 'fr');
 const langFile = ref<typeof fr | typeof en>(localStorage.getItem('lang') === 'en' ? en : fr);
 
 const showStats = (val: boolean) => {
@@ -25,7 +25,7 @@ const showStats = (val: boolean) => {
 }
 
 onMounted(async () => {
-  if (!localStorage.getItem('lang')) localStorage.setItem('lang', 'en');
+  if (!localStorage.getItem('lang')) localStorage.setItem('lang', 'fr');
 });
 
 watch(lang, () => {
