@@ -42,13 +42,15 @@ interface Stat {
 
 const statsWT = ref<Stat[]>([]);
 const statsPRT = ref<Stat[]>([]);
+const statsTDF = ref<Stat[]>([]);
 const statsTotal = ref<Stat[]>([]);
 const stats = ref<Stat>({ nbGuess: 0, green: 0, orange: 0, red: 0 });
 
 watch(isStatDialogActive, () => {
   statsWT.value = JSON.parse(localStorage.getItem('statsWT') || '[]');
   statsPRT.value = JSON.parse(localStorage.getItem('statsPRT') || '[]');
-  statsTotal.value = [...statsWT.value, ...statsPRT.value];
+  statsTDF.value = JSON.parse(localStorage.getItem('statsTDF') || '[]');
+  statsTotal.value = [...statsWT.value, ...statsPRT.value, ...statsTDF.value];
 
   const keys = ['nbGuess', 'green', 'orange', 'red'] as const;
   const totalCount = statsTotal.value.length || 1;
@@ -96,7 +98,7 @@ const options = (chartType: string) => ({
   plugins: {
     title: {
       display: true,
-      text: chartType === 'world-tour' ? langFile.value.app_modal_stats_title_chart_1 : langFile.value.app_modal_stats_title_chart_2,
+      text: chartType === 'world-tour' ? langFile.value.app_modal_stats_title_chart_1 : chartType === 'pro-tour' ? langFile.value.app_modal_stats_title_chart_2 : langFile.value.app_modal_stats_title_chart_3,
       position: 'bottom',
       color: 'white',
     },
@@ -211,6 +213,7 @@ const options = (chartType: string) => ({
           <div id="chart-container">
             <BarChart class="chart" :chartData="formatStats(statsWT)" :options="options('world-tour')" />
             <BarChart class="chart" :chartData="formatStats(statsPRT)" :options="options('pro-tour')" />
+            <BarChart class="chart" :chartData="formatStats(statsTDF)" :options="options('tdf')" />
           </div>
         </v-card-text>
       </v-card>

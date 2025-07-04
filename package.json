@@ -9,7 +9,8 @@
     "dev": "concurrently 'npm:dev:frontend' 'npm:dev:backend'",
     "build": "vue-tsc && vite build",
     "preview": "vite preview",
-    "create-riders-database": "node src/api/create-riders-database.js"
+    "create-db": "node src/api/create-riders-database.js",
+    "create-tdf-db": "node src/api/create-riders-tdf-database.js"
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",

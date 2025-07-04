@@ -1,6 +1,7 @@
 {
     "home_title_wt": "Devinez le coureur World Tour",
     "home_title_prt": "Devinez le coureur Pro Tour",
+    "home_title_tdf":  "Devinez le coureur du Tour de France (vainqueur d'un maillot)",
     "app_modal_how_to_play_title": "Comment jouer ?",
     "app_modal_how_to_play_text_1": "Chaque jour, un coureur aléatoire (encore en activité) est choisi parmi les X premiers du classement UCI. Le but est de le trouver avec le moins d'essais possible.\nÀ chaque essai, les informations du coureur que vous avez sélectionné donnerons des indications sur le coureur recherché.",
     "app_modal_how_to_play_legend_1_1": "Valeur plus élevée",
@@ -25,6 +26,8 @@
     "game_datatable_header_win": "Victoire",
     "game_datatable_header_gt_classic": "Grand Tour / Classique",
     "game_datatable_header_specialties": "Spécialités",
+    "game_datatable_header_jersey": "Maillot",
+    "game_datatable_header_year_tdf": "Année",
     "game_datatable_tooltip_specialties_text": "Profil du coureur basé sur PCS",
     "game_datatable_tooltip_specialties_one": "Course d'un jour",
     "game_datatable_tooltip_specialties_gc": "Classement général",
@@ -34,6 +37,8 @@
     "game_datatable_tooltip_specialties_hil": "Puncheur",
     "game_datatable_tooltip_age_lower": "Le coureur est plus jeune",
     "game_datatable_tooltip_age_upper": "Le coureur est plus vieux",
+    "game_datatable_tooltip_year_upper": "Le coureur a gagné son maillot dans une année plus récente",
+    "game_datatable_tooltip_year_lower": "Le coureur a gagné son maillot dans une année plus ancienne",
     "game_datatable_tooltip_nationality_red": "Pas de frontière partagée entre ce pays et celui du coureur",
     "game_datatable_tooltip_nationality_orange": "Ce pays partage une frontière avec le pays du coureur",
     "game_datatable_tooltip_weight_lower": "Le coureur est plus léger",
@@ -64,5 +69,6 @@
     "app_modal_stats_stat_4": "de 🟨",
     "app_modal_stats_text_chart": "Répartition des essais",
     "app_modal_stats_title_chart_1": "World Tour",
-    "app_modal_stats_title_chart_2": "Pro Tour"
+    "app_modal_stats_title_chart_2": "Pro Tour",
+    "app_modal_stats_title_chart_3": "Tour de France"
 }

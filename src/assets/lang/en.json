@@ -1,6 +1,7 @@
 {
     "home_title_wt": "Guess the World Tour rider",
     "home_title_prt": "Guess the Pro Tour rider",
+    "home_title_tdf": "Guess the Tour de France rider (winner of a jersey)",
     "app_modal_how_to_play_title": "How to play?",
     "app_modal_how_to_play_text_1": "Each day, a random rider (still active) is chosen from the top X of the UCI rankings. The aim is to find this rider in as few trials as possible. With each trial, the rider information you've selected will give clues to the rider you're looking for.",
     "app_modal_how_to_play_legend_1_1": "Higher value",
@@ -25,6 +26,8 @@
     "game_datatable_header_win": "Win",
     "game_datatable_header_gt_classic": "Grand Tour / Classic",
     "game_datatable_header_specialties": "Specialties",
+    "game_datatable_header_jersey": "Jersey",
+    "game_datatable_header_year_tdf": "Year",
     "game_datatable_tooltip_specialties_text": "Rider profile based on PCS",
     "game_datatable_tooltip_specialties_gc": "General classification",
     "game_datatable_tooltip_specialties_one": "One day race",
@@ -34,6 +37,8 @@
     "game_datatable_tooltip_specialties_hil": "Puncheur",
     "game_datatable_tooltip_age_lower": "Rider is younger",
     "game_datatable_tooltip_age_upper": "Rider is older",
+    "game_datatable_tooltip_year_upper": "Rider won his jersey in a later year",
+    "game_datatable_tooltip_year_lower": "Rider won his jersey in an earlier year",
     "game_datatable_tooltip_nationality_red": "No common border between this country and that of the rider",
     "game_datatable_tooltip_nationality_orange": "This country shares a border with the rider's country",
     "game_datatable_tooltip_weight_lower": "Rider is lighter",
@@ -64,5 +69,6 @@
     "app_modal_stats_stat_4": "of 🟨",
     "app_modal_stats_text_chart": "Distribution of tries",
     "app_modal_stats_title_chart_1": "World Tour",
-    "app_modal_stats_title_chart_2": "Pro Tour"
+    "app_modal_stats_title_chart_2": "Pro Tour",
+    "app_modal_stats_title_chart_3": "Tour de France"
 }

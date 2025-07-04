@@ -108,65 +108,7 @@ async function ridersInfo(urls) {
   }
 }
 
-/**
- * Build a temporary database for the TDF
- */
-async function ridersTDF() {
-  try {
-    const data = await got('https://fr.wikipedia.org/wiki/Palmar%C3%A8s_du_Tour_de_France');
-    const page = new JSDOM(data.body).window.document;
-    const table = page.querySelector('.wikitable');
-    const rows = table.querySelectorAll('tr');
-    const filteredRows = Array.from(rows).slice(34);
-
-    /*const riderName = filteredRows[77].querySelector('td:nth-child(2) a:nth-child(2)').innerHTML.replace(/ /g, '-').toLowerCase();
-    const riderUrl = `https://www.procyclingstats.com/rider/${riderName.replace(/ /g, '-').toLowerCase()}`;
-    const response = await got(riderUrl);
-    const riderPage = new JSDOM(response.body).window.document;
-    const riderData = await parseRiderDetails(riderPage, riderUrl, 'TDF');*/
-
-    const ridersArray = [];
-    filteredRows.forEach(async (row) => {
-      const cells = row.querySelectorAll('td');
-      const jersey = ['yellow', 'kom', 'green', 'white', 'combativity'];
-      // case 1 = jaune, 10 = à pois, 11 = vert, 12 = blanc, 13 = combatif
-      const riders = [
-        cells[1].textContent.split('[')[0].trim(),
-        cells[10].textContent.split('[')[0].trim(),
-        cells[11].textContent.split('[')[0].trim(),
-        cells[12].textContent.split('[')[0].trim(),
-        cells[13].textContent.split('[')[0].trim()
-      ];
-      for (const [index, riderName] of riders.entries()) {
-        if (riderName) {
-          ridersArray.push({
-            name: riderName,
-            year: cells[0].textContent.split(' ')[0].trim(),
-            jersey: jersey[index]
-          });
-          /*const riderUrl = `https://www.procyclingstats.com/rider/${riderName.replace(/ /g, '-').toLowerCase()}`;
-          const response = await got(riderUrl);
-          const riderPage = new JSDOM(response.body).window.document;
-          const name = riderPage.querySelector('h1')?.textContent.replace('  ', ' ').normalize("NFD").replace(/\p{Diacritic}/gu, "").replace(/\u0142/g, "l").replace(/\u00f8/g, "o").replace(/\u00e6/g, "ae");
-          console.log(riderName, name);
-
-          //const riderData = await parseRiderDetails(riderPage, riderUrl, 'TDF');
-          //console.log(riderData);
-          //alasql('INSERT INTO rider VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', riderData);*/
-        }
-      }
-      // const request = await got(`https://www.procyclingstats.com/rider/${rider.name.replace(/ /g, '-').toLowerCase()}`);
-      
-    });
-
-  } catch (error) {
-    console.error('Error:', error.message);
-  }
-}
-
 export { ridersURL, ridersInfo};
-
-await ridersTDF();
 
 // Retrieve profile URLs of the riders from ProCyclingStats
 // await ridersURL(1, 'src/api/data/ridersWT.txt'); // 1 for World Tour, 2 for ProTeam
