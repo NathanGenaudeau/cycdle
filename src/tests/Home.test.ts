@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
-import Home from './components/Home.vue';
+import Home from '../components/Home.vue';
 
 const push = vi.fn();
 vi.mock('vue-router', () => ({

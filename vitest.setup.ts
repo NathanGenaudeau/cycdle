@@ -18,3 +18,15 @@ const vuetify = createVuetify({
 
 // Injecte Vuetify dans tous les mounts de test
 config.global.plugins = [vuetify];
+
+class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+globalThis.ResizeObserver = ResizeObserver
+
+declare global {
+  var ResizeObserver: typeof ResizeObserver
+}
