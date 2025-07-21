@@ -59,11 +59,11 @@ watch(isStatDialogActive, () => {
   <v-layout class="app rounded rounded-md">
     <v-app-bar>
       <v-app-bar-title>
-        <v-img :src="logo" class="logo" @click="router.push('/')" />
+        <v-img :src="logo" class="logo" @click="router.push('/')" alt="Cycdle Logo" />
       </v-app-bar-title>
-      <v-btn icon="mdi-chart-box-outline" @click="isStatDialogActive = true"></v-btn>
-      <v-btn icon="mdi-help" @click="isHelpDialogActive = true"></v-btn>
-      <v-btn icon="mdi-link-variant" @click="isCreditDialogActive = true"></v-btn>
+      <v-btn icon="mdi-chart-box-outline" @click="isStatDialogActive = true" data-test="stats-btn"></v-btn>
+      <v-btn icon="mdi-help" @click="isHelpDialogActive = true" data-test="help-btn"></v-btn>
+      <v-btn icon="mdi-link-variant" @click="isCreditDialogActive = true" data-test="credits-btn"></v-btn>
       <v-menu>
         <template v-slot:activator="{ props }">
           <v-btn icon="mdi-translate" v-bind="props"></v-btn>
@@ -86,8 +86,7 @@ watch(isStatDialogActive, () => {
     <v-main class="d-flex align-center justify-center">
       <RouterView :lang @goToStats="showStats" />
     </v-main>
-  </v-layout>
-  <v-dialog max-width="500" v-model="isStatDialogActive">
+      <v-dialog max-width="500" v-model="isStatDialogActive">
     <template v-slot:default="{ isActive }">
       <v-card>
         <v-card-title class="d-flex justify-space-between align-center pb-0">
@@ -230,4 +229,5 @@ watch(isStatDialogActive, () => {
       </v-card>
     </template>
   </v-dialog>
+</v-layout>
 </template>
