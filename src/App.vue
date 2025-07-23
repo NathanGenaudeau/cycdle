@@ -16,6 +16,8 @@ const isHelpDialogActive = ref<boolean>(false);
 const isCreditDialogActive = ref<boolean>(false);
 
 const lang = ref<string>(localStorage.getItem('lang') || 'fr');
+defineExpose({ lang });
+
 const langFile = ref<typeof fr | typeof en>(localStorage.getItem('lang') === 'en' ? en : fr);
 
 const showStats = (val: boolean) => {
@@ -66,7 +68,7 @@ watch(isStatDialogActive, () => {
       <v-btn icon="mdi-link-variant" @click="isCreditDialogActive = true" data-test="credits-btn"></v-btn>
       <v-menu>
         <template v-slot:activator="{ props }">
-          <v-btn icon="mdi-translate" v-bind="props"></v-btn>
+          <v-btn icon="mdi-translate" v-bind="props" data-test="lang-btn"></v-btn>
         </template>
         <v-list id="lang">
           <v-list-item @click="lang = 'fr'" class="lang-item">
