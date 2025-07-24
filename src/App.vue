@@ -16,7 +16,7 @@ const isHelpDialogActive = ref<boolean>(false);
 const isCreditDialogActive = ref<boolean>(false);
 
 const lang = ref<string>(localStorage.getItem('lang') || 'fr');
-defineExpose({ lang });
+//defineExpose({ lang });
 
 const langFile = ref<typeof fr | typeof en>(localStorage.getItem('lang') === 'en' ? en : fr);
 

@@ -29,9 +29,6 @@ describe('App.vue', async() => {
       global: {
         plugins: [router],
         stubs: {
-          VDialog: {
-            template: '<div><slot></slot></div>'
-          },
           ChartContainer: true,
         }
       }
@@ -52,41 +49,33 @@ describe('App.vue', async() => {
   });
 
   it('Stats opens', async () => {
-    console.log(wrapper.html());
     const btn = wrapper.find('[data-test="stats-btn"]');
     await btn.trigger('click');
-    await nextTick();
-    //console.log(wrapper.html());
-    expect(wrapper.html()).toContain('Statistiques');
+    expect(document.body.innerHTML).toContain('Statistiques');
   });
 
-  /*it('Help opens', async () => {
+  it('Help opens', async () => {
     const btn = wrapper.find('[data-test="help-btn"]');
     await btn.trigger('click');
-    await nextTick();
-    expect(wrapper.html()).toContain('Comment jouer ?');
+    expect(document.body.innerHTML).toContain('Comment jouer ?');
   });
 
   it('Credits opens', async () => {
     const btn = wrapper.find('[data-test="credits-btn"]');
     await btn.trigger('click');
-    await nextTick();
-    expect(wrapper.html()).toContain('Crédits');
+    expect(document.body.innerHTML).toContain('Crédits');
   });
 
   it('Lang opens and changes', async () => {
-    const setItemSpy = vi.spyOn(window.localStorage.__proto__, 'setItem');
+    //const setItemSpy = vi.spyOn(window.localStorage.__proto__, 'setItem');
 
     const btn = wrapper.find('[data-test="lang-btn"]');
     await btn.trigger('click');
     await nextTick();
-    await nextTick();
-
-    //const langItems = document.querySelectorAll('.lang-item');
-    const langItems = wrapper.findAll('.lang-item');
-    console.log(langItems.length);
-    langItems[1].trigger('click');
+    
+    const langItems = document.querySelectorAll('.lang-item');
+    (langItems[1] as HTMLElement).click();
     expect((wrapper.vm as any).lang).toBe('en');
-    expect(setItemSpy).toHaveBeenCalledWith('lang', 'en');
-  });*/
+    //expect(setItemSpy).toHaveBeenCalledWith('lang', 'en');
+  });
 });
