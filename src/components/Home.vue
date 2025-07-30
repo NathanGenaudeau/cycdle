@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import { ref, watch } from 'vue';
-import { useDisplay } from 'vuetify'
 
 import fr from '../assets/lang/fr.json';
 import en from '../assets/lang/en.json';
 
-const { mobile } = useDisplay();
 const router = useRouter();
+
+defineExpose({ redirection });
 
 function redirection(selectedMode: string) {
   localStorage.setItem('mode', selectedMode);
@@ -16,11 +16,6 @@ function redirection(selectedMode: string) {
   } else {
     router.push({ name: 'game' });
   }
-}
-
-function formatText(text: string): string {
-  if (mobile.value) return text.replace(" d", '<br>d').replace(" (", '<br>(');
-  else return text.replace(" (", '<br>(');
 }
 
 const props = defineProps({ lang: String});
@@ -44,7 +39,8 @@ watch(() => props.lang, () => {
       </v-btn>
     </div>
     <div class="d-block pa-2 new-mode">
-      <v-btn size="large" rounded="lg" @click="redirection('tdf')" v-html="formatText(langFile.home_title_tdf)">
+      <v-btn class="wrap-button" size="large" rounded="lg" @click="redirection('tdf')">
+         <span class="btn-text">{{ langFile.home_title_tdf }}</span>
       </v-btn>
     </div>
   </div>

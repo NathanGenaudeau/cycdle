@@ -16,6 +16,7 @@ dist-ssr
 src/api/data/img
 src/api/data/*.txt
 src/api/*.json
+coverage
 
 # Editor directories and files
 .vscode/*

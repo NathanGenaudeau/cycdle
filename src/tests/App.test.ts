@@ -29,7 +29,7 @@ describe('App.vue', async() => {
       global: {
         plugins: [router],
         stubs: {
-          ChartContainer: true,
+          ChartStatistics: true,
         }
       }
     });
@@ -67,8 +67,6 @@ describe('App.vue', async() => {
   });
 
   it('Lang opens and changes', async () => {
-    //const setItemSpy = vi.spyOn(window.localStorage.__proto__, 'setItem');
-
     const btn = wrapper.find('[data-test="lang-btn"]');
     await btn.trigger('click');
     await nextTick();
@@ -76,6 +74,5 @@ describe('App.vue', async() => {
     const langItems = document.querySelectorAll('.lang-item');
     (langItems[1] as HTMLElement).click();
     expect((wrapper.vm as any).lang).toBe('en');
-    //expect(setItemSpy).toHaveBeenCalledWith('lang', 'en');
   });
 });

@@ -171,3 +171,14 @@
     color: #075bb5;
   }
 }
+
+.wrap-button {
+  width: 100%;
+  text-align: center;
+}
+
+.btn-text {
+  display: block;
+  white-space: normal;
+  word-break: break-word;
+}

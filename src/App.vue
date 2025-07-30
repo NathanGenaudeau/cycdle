@@ -2,7 +2,7 @@
 import { useRouter } from 'vue-router';
 import { ref, watch, onMounted } from 'vue';
 
-import ChartContainer from './components/ChartContainer.vue';
+import ChartStatistics from './components/ChartStatistics.vue';
 import type { Stat } from './types/Stat';
 
 import logo from './assets/logo/cycdle-white.png';
@@ -16,7 +16,6 @@ const isHelpDialogActive = ref<boolean>(false);
 const isCreditDialogActive = ref<boolean>(false);
 
 const lang = ref<string>(localStorage.getItem('lang') || 'fr');
-//defineExpose({ lang });
 
 const langFile = ref<typeof fr | typeof en>(localStorage.getItem('lang') === 'en' ? en : fr);
 
@@ -126,9 +125,9 @@ watch(isStatDialogActive, () => {
           </v-col>
           <h3 class="py-2">{{ langFile.app_modal_stats_text_chart }}</h3>
           <div id="chart-container">
-            <ChartContainer :stats="statsWT" chartType="world-tour" :langFile="langFile" />
-            <ChartContainer :stats="statsPRT" chartType="pro-tour" :langFile="langFile" />
-            <ChartContainer :stats="statsTDF" chartType="tour-de-france" :langFile="langFile" />
+            <ChartStatistics :stats="statsWT" chartType="world-tour" :langFile="langFile" />
+            <ChartStatistics :stats="statsPRT" chartType="pro-tour" :langFile="langFile" />
+            <ChartStatistics :stats="statsTDF" chartType="tour-de-france" :langFile="langFile" />
           </div>
         </v-card-text>
       </v-card>

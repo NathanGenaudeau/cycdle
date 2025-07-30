@@ -1,14 +1,9 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, watch, } from 'vue';
 import { useDisplay } from 'vuetify'
-import { BarChart } from 'vue-chart-3';
-import { Chart, registerables } from 'chart.js';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
-Chart.register(...registerables);
-Chart.register(ChartDataLabels);
+import ChartSpecialities from './ChartSpecialities.vue';
 
 import type { Rider } from '../types/Rider';
-import type { RiderSpecialities } from '../types/RiderSpecialities';
 
 import neighbours from '../api/data/neighbours.json';
 const neighboursTyped = neighbours as Record<string, { neighbours: string[] }>;
@@ -220,110 +215,6 @@ const getAttributeArrow = (value: number|string, type: string) => {
   return 'mdi-check';
 };
  
-const getSpecialityColor = (value: number, type: string) => {
-  if (!randomRider.value) return 'red';
-  if (value - 5 <= randomRider.value[type as keyof RiderSpecialities] && value + 5 >= randomRider.value[type as keyof RiderSpecialities]) return 'green';
-  else if (value - 15 <= randomRider.value[type as keyof RiderSpecialities] && value + 15 >= randomRider.value[type as keyof RiderSpecialities]) return 'orange';
-  else return 'red';
-};
-
-const compareGraph = (val: number, val2: number) => {
-  if (val - 5 <= val2 && val + 5 >= val2) return '';
-  else if (val > val2) return '▲';
-  else if (val < val2) return '▼';
-};
-
-const labelPositionning = (val: number, val2: number) => {
-  return val > val2 ? '-5' : '-20';
-}
- 
-const options = {
-  layout: {
-    padding: {
-      top: 25
-    }
-  },
-  responsive: true,
-  plugins: {
-    datalabels: {
-      color: 'white',
-      anchor: 'end',
-      align: 'end',
-      offset: (context: any) => {
-        if (!randomRider.value) return;
-        switch(context.chart.data.labels[context.dataIndex]) {
-          case 'ONE':
-            return labelPositionning(randomRider.value.one_day_races, context.dataset.data[context.dataIndex]);
-          case 'GC':
-            return labelPositionning(randomRider.value.general_classification, context.dataset.data[context.dataIndex]);
-          case 'TT':
-            return labelPositionning(randomRider.value.time_trial, context.dataset.data[context.dataIndex]);
-          case 'SPR':
-            return labelPositionning(randomRider.value.sprint, context.dataset.data[context.dataIndex]);
-          case 'CLI':
-            return labelPositionning(randomRider.value.climber, context.dataset.data[context.dataIndex]);
-          case 'HIL':
-            return labelPositionning(randomRider.value.hills, context.dataset.data[context.dataIndex]);
-        }
-      },
-      formatter: (val: any, context: any) => {
-        if (!randomRider.value) return;
-        switch(context.chart.data.labels[context.dataIndex]) {
-          case 'ONE':
-            return compareGraph(randomRider.value.one_day_races, val);
-          case 'GC':
-            return compareGraph(randomRider.value.general_classification, val);
-          case 'TT':
-            return compareGraph(randomRider.value.time_trial, val);
-          case 'SPR':
-            return compareGraph(randomRider.value.sprint, val);
-          case 'CLI':
-            return compareGraph(randomRider.value.climber, val);
-          case 'HIL':
-            return compareGraph(randomRider.value.hills, val);
-        }
-      }
-    },
-    tooltip: {
-      callbacks: {
-        label: (context: any) => {
-          return context.dataset.data[context.dataIndex] + '%';
-        },
-      }
-    },
-    legend: {
-      display: false
-    }
-  },
- 
-  scales: {
-    y: {
-      ticks: {
-        callback: function (value: number) {
-          return value + '%';
-        },
-      }
-    }
-  }
-};
- 
-const formatRiderSpecialities = (rider: Rider) => {
-  return {
-    labels: ['ONE', 'GC', 'TT', 'SPR', 'CLI', 'HIL'],
-    datasets: [{
-      data: [rider.one_day_races, rider.general_classification, rider.time_trial, rider.sprint, rider.climber, rider.hills],
-      backgroundColor: [
-        getSpecialityColor(rider.one_day_races, 'one_day_races'),
-        getSpecialityColor(rider.general_classification, 'general_classification'),
-        getSpecialityColor(rider.time_trial, 'time_trial'),
-        getSpecialityColor(rider.sprint, 'sprint'),
-        getSpecialityColor(rider.climber, 'climber'),
-        getSpecialityColor(rider.hills, 'hills')
-      ]
-    }]
-  };
-}
- 
 const saveToClipboard = () => {
   const firstDate = new Date('2025-03-02');
   const nb = Math.floor((new Date().getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -504,7 +395,7 @@ const customFilter = (_itemTitle: any, query: string, item: any) => {
         </v-tooltip>
       </template>
       <template v-slot:item.specialties="{ item }">
-        <BarChart :chartData="formatRiderSpecialities(item)" :options :height="300" />
+        <ChartSpecialities v-if="randomRider" :rider="item" :randomRider />
       </template>
       <template v-slot:bottom>
       </template>

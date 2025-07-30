@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { BarChart } from 'vue-chart-3';
 import { Chart, registerables } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
@@ -100,7 +99,6 @@ const options = (chartType: string) => ({
     },
   },
 });
-
 </script>
 
 <template>

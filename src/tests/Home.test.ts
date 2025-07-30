@@ -13,6 +13,24 @@ describe('Home.vue', () => {
     push.mockClear();
   });
 
+  it('function redirection with rider-wt mode', async () => {
+    const wrapper = mount(Home);
+    const { redirection } = wrapper.vm as any;
+    redirection('rider-wt');
+    expect(push).toHaveBeenCalledWith({ name: 'game' });
+    expect(push).toHaveBeenCalledTimes(1);
+    expect(localStorage.getItem('mode')).toBe('rider-wt');
+  });
+
+  it('function redirection with tdf mode', async () => {
+    const wrapper = mount(Home);
+    const { redirection } = wrapper.vm as any;
+    redirection('tdf');
+    expect(push).toHaveBeenCalledWith({ name: 'game-tdf' });
+    expect(push).toHaveBeenCalledTimes(1);
+    expect(localStorage.getItem('mode')).toBe('tdf');
+  });
+
   it('renders French by default', async () => {
     localStorage.setItem('lang', 'fr');
     const wrapper = mount(Home, { props: { lang: 'fr' } });
