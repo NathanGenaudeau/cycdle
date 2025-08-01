@@ -29,17 +29,17 @@ watch(() => props.lang, () => {
 <template>
   <div class="home">
     <div class="d-block pa-2">
-      <v-btn size="large" rounded="lg" @click="redirection('rider-wt')">
+      <v-btn @click="redirection('rider-wt')" size="large" rounded="lg">
         {{ langFile.home_title_wt }}
       </v-btn>
     </div>
     <div class="d-block pa-2">
-      <v-btn size="large" rounded="lg" @click="redirection('rider-prt')">
+      <v-btn @click="redirection('rider-prt')" size="large" rounded="lg">
         {{ langFile.home_title_prt }}
       </v-btn>
     </div>
     <div class="d-block pa-2 new-mode">
-      <v-btn class="wrap-button" size="large" rounded="lg" @click="redirection('tdf')">
+      <v-btn @click="redirection('tdf')" class="wrap-button" size="large" rounded="lg">
          <span class="btn-text">{{ langFile.home_title_tdf }}</span>
       </v-btn>
     </div>

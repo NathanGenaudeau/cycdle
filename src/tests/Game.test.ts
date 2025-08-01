@@ -45,4 +45,10 @@ describe('Game.vue', () => {
     await flushPromises();
     expect(wrapper.vm.riders).toEqual(mockRiderList);
   });
+
+  /*it('function getHelpText', () => {
+    const helpText = wrapper.vm.getHelpText();
+    expect(helpText).toBeDefined();
+    expect(helpText).toContain('How to play');
+  })*/
 });
